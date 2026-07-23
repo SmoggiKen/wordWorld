@@ -37,14 +37,20 @@
 
       <nav class="tabs" aria-label="Main sections">
         <button class="tab active" data-view="scan">Scan</button>
-        <button class="tab" data-view="rewards">Rewards</button>
+        <button class="tab" data-view="rewards">Map</button>
         <button class="tab" data-view="inventory">Inventory</button>
       </nav>
 
       <section id="scanView" class="view active">
         <div class="scan-grid">
           <div class="scan-panel">
-            <h2>Scan writing</h2>
+            <div class="scan-heading">
+              <div>
+                <h2>Scan writing</h2>
+                <p class="selected-writer">For <strong id="scanWriterName">Explorer</strong></p>
+              </div>
+              <button id="changeWriterButton" class="secondary-button" type="button">Change</button>
+            </div>
             <p class="muted">Take a photo of a handwritten sentence. The app looks for positive features and unlocks progress.</p>
             <form id="scanForm">
               <label class="upload-box">
@@ -64,18 +70,40 @@
       </section>
 
       <section id="rewardsView" class="view">
-        <div class="reward-stage">
-          <h2>Celebration</h2>
-          <div id="rewardCards" class="reward-cards">
-            <p class="empty-state">Scan a sentence to see rewards here.</p>
+        <div class="map-layout">
+          <div class="map-stage">
+            <div class="map-header">
+              <div>
+                <p class="eyebrow">Lesson Map</p>
+                <h2>Writing Islands</h2>
+              </div>
+              <div class="group-score">
+                <span>Group XP</span>
+                <strong id="groupXp">0</strong>
+              </div>
+            </div>
+            <div id="islandMap" class="island-map"></div>
           </div>
+
+          <aside class="roster-panel">
+            <h2>Players</h2>
+            <div id="playerRoster" class="player-roster"></div>
+            <div class="celebration-panel">
+              <h2>Latest Rewards</h2>
+              <div id="rewardCards" class="reward-cards">
+                <p class="empty-state">Scan work to light up the map.</p>
+              </div>
+            </div>
+          </aside>
         </div>
       </section>
 
       <section id="inventoryView" class="view">
         <div class="inventory-header">
-          <h2>Inventory</h2>
-          <p class="muted">Unlocked tools show what your writer has learned.</p>
+          <div>
+            <h2>Inventory</h2>
+            <p class="muted">Unlocked tools show what <span id="inventoryWriterName">your writer</span> has learned.</p>
+          </div>
         </div>
         <div id="inventoryGrid" class="inventory-grid"></div>
       </section>
