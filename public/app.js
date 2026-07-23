@@ -277,35 +277,6 @@ function renderDetailForCurrentPlayer() {
   els.detailPanel.hidden = true;
 }
 
-function renderIslandDetail(index) {
-  const criterion = state.criteria[index];
-  if (!criterion) return;
-  els.detailPanel.hidden = false;
-  els.detailPanel.innerHTML = `
-    <button class="detail-close" type="button" data-action="close-detail" aria-label="Close objective">x</button>
-    <p class="eyebrow">Lesson Island</p>
-    <div class="detail-title">
-      ${toolImage({
-        key: criterion.unlock_item_key || criterion.key,
-        name: criterion.unlock_item_name || criterion.label,
-        assetPath: criterion.unlock_asset_path
-      })}
-      <div>
-        <h2>${escapeHtml(criterion.label)}</h2>
-        <p class="muted">+${criterion.xp_reward} XP</p>
-      </div>
-    </div>
-    <div class="objective-outline">
-      <strong>Objective</strong>
-      <p>${escapeHtml(criterion.prompt_text)}</p>
-    </div>
-    <div class="detail-list">
-      <strong>Unlocks</strong>
-      <span>${escapeHtml(criterion.unlock_item_name || "Writing tool")}</span>
-    </div>
-  `;
-}
-
 function islandDetailHtml(index) {
   const criterion = state.criteria[index];
   if (!criterion) return "";
@@ -496,19 +467,8 @@ els.islandMap.addEventListener("click", (event) => {
   const island = event.target.closest("[data-island-index]");
   if (!island) return;
   const islandIndex = Number(island.dataset.islandIndex);
-  renderIslandDetail(islandIndex);
+  els.detailPanel.hidden = true;
   openIslandModal(islandIndex);
-});
-
-els.detailPanel.addEventListener("click", (event) => {
-  if (event.target.closest("[data-action='close-detail']")) {
-    els.detailPanel.hidden = true;
-    return;
-  }
-
-  const button = event.target.closest("[data-action='open-inventory']");
-  if (!button) return;
-  openInventoryModal();
 });
 
 els.playerRoster.addEventListener("click", (event) => {
