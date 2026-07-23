@@ -30,13 +30,11 @@ const state = {
 const els = {
   currentYearTitle: document.querySelector("#currentYearTitle"),
   level: document.querySelector("#level"),
-  selectedPlayerName: document.querySelector("#selectedPlayerName"),
   groupXp: document.querySelector("#groupXp"),
   islandMap: document.querySelector("#islandMap"),
   playerLayer: document.querySelector("#playerLayer"),
   playerRoster: document.querySelector("#playerRoster"),
   detailPanel: document.querySelector("#detailPanel"),
-  playerActionDock: document.querySelector(".player-action-dock"),
   rewardCards: document.querySelector("#rewardCards"),
   modalRewardCards: document.querySelector("#modalRewardCards"),
   scanForm: document.querySelector("#scanForm"),
@@ -155,7 +153,6 @@ function renderHud() {
   }, 0);
   els.currentYearTitle.textContent = yearLabel;
   els.level.textContent = `${yearLabel} - ${xp} XP`;
-  els.selectedPlayerName.textContent = state.profile?.display_name || "Explorer";
   els.groupXp.textContent = totalXp;
 }
 
@@ -211,14 +208,23 @@ function renderRoster() {
     const profile = profileState?.profile;
     const active = player.id === state.profileId;
     const progress = progressIslandIndex(profileState) + 1;
+    const progressPercent = progressPercentFor(profileState);
     return `
-      <button class="player-card ${active ? "active" : ""}" type="button" data-profile-id="${escapeHtml(player.id)}">
-        ${playerToken(player, profile?.display_name)}
-        <span>
-          <strong>${escapeHtml(profile?.display_name || player.name)}</strong>
-          <small>${yearLabelForLevel(profile?.level || 1)} - Island ${progress} - ${profile?.xp || 0} XP</small>
-        </span>
-      </button>
+      <div class="player-card ${active ? "active" : ""}">
+        <button class="player-select-button" type="button" data-profile-id="${escapeHtml(player.id)}">
+          ${playerToken(player, profile?.display_name)}
+          <span class="player-card-main">
+            <strong>${escapeHtml(profile?.display_name || player.name)}</strong>
+            <small>${yearLabelForLevel(profile?.level || 1)} - Island ${progress} - ${profile?.xp || 0} XP</small>
+            <span class="player-progress" aria-label="${progressPercent}% complete">
+              <span style="--progress: ${progressPercent}%;"></span>
+            </span>
+          </span>
+        </button>
+        <button class="inventory-card-button" type="button" data-action="open-inventory" data-profile-id="${escapeHtml(player.id)}">
+          Inventory / Assess
+        </button>
+      </div>
     `;
   }).join("");
 }
@@ -388,13 +394,15 @@ els.detailPanel.addEventListener("click", (event) => {
   openInventoryModal();
 });
 
-els.playerActionDock.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-action='open-inventory']");
-  if (!button) return;
-  openInventoryModal();
-});
-
 els.playerRoster.addEventListener("click", (event) => {
+  const inventoryButton = event.target.closest("[data-action='open-inventory']");
+  if (inventoryButton) {
+    setCurrentProfile(inventoryButton.dataset.profileId);
+    render();
+    openInventoryModal();
+    return;
+  }
+
   const card = event.target.closest("[data-profile-id]");
   if (!card) return;
   setCurrentProfile(card.dataset.profileId);
@@ -522,6 +530,19 @@ function progressIslandIndex(profileState) {
     return criterion.unlock_item_key && unlockedKeys.has(criterion.unlock_item_key);
   });
   return Math.min(Math.max(unlockedCriteria.length, 0), Math.max(state.criteria.length - 1, 0));
+}
+
+function progressPercentFor(profileState) {
+  if (!profileState || !state.criteria.length) return 0;
+  const unlockedKeys = new Set(
+    profileState.inventory
+      .filter((item) => item.unlocked)
+      .map((item) => item.key)
+  );
+  const unlockedCriteriaCount = state.criteria.filter((criterion) => {
+    return criterion.unlock_item_key && unlockedKeys.has(criterion.unlock_item_key);
+  }).length;
+  return Math.round((unlockedCriteriaCount / state.criteria.length) * 100);
 }
 
 function toolImage({ key, name, assetPath, locked = false }) {
