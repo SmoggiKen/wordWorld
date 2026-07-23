@@ -327,42 +327,66 @@ function playerDetailHtml(player, profileState) {
   const profile = profileState?.profile;
   const unlocked = profileState?.inventory.filter((item) => item.unlocked) || [];
   const locked = profileState?.inventory.filter((item) => !item.unlocked) || [];
+  const inventory = [...unlocked, ...locked];
+  const unlockedKeys = new Set(unlocked.map((item) => item.key));
+  const slots = equipmentSlotsFor(inventory);
+  const stats = writingStatsFor(profileState);
   return `
-    <section class="quest-panel player-quest-panel">
-      <header class="quest-panel-header" id="inventoryModalTitle">Player Inventory</header>
-      <div class="quest-panel-body">
-        <div class="quest-row quest-row-hero">
-          <span class="quest-row-icon player-quest-token">
-            ${playerToken(player, profile?.display_name)}
-          </span>
-          <div class="quest-row-copy">
-            <strong>${escapeHtml(profile?.display_name || player.name)}</strong>
-            <small>${yearLabelForLevel(profile?.level || 1)} - Island ${progressIslandIndex(profileState) + 1} - ${profile?.xp || 0} XP</small>
-          </div>
-        </div>
-        <div class="quest-row quest-row-summary">
-          <span class="quest-row-icon quest-row-letter">I</span>
-          <div class="quest-row-copy">
-            <strong>Inventory</strong>
-            <small>${unlocked.length}/${unlocked.length + locked.length} tools unlocked</small>
-          </div>
-        </div>
-        ${[...unlocked, ...locked].map((item) => `
-          <div class="quest-row ${item.unlocked ? "" : "locked"}">
-            <span class="quest-row-icon">
-              ${toolImage({
-                key: item.key,
-                name: item.name,
-                assetPath: item.asset_path,
-                locked: !item.unlocked
-              })}
-            </span>
-            <div class="quest-row-copy">
-              <strong>${escapeHtml(item.name)}</strong>
-              <small>${item.unlocked ? "Tool unlocked" : "Locked tool"}</small>
+    <section class="equipment-screen">
+      <header class="equipment-header" id="inventoryModalTitle">
+        <span>Equipment</span>
+        <strong>${unlocked.length}/${inventory.length}</strong>
+      </header>
+      <div class="equipment-layout">
+        <div class="equipment-hero">
+          <div class="equipment-stage">
+            ${slots.map((slot) => equipmentSlotHtml(slot, unlockedKeys)).join("")}
+            <div class="avatar-platform">
+              <div class="equipment-avatar" style="--player-color: ${escapeHtml(player.color)};">
+                <span class="avatar-hair"></span>
+                <span class="avatar-head">${escapeHtml((profile?.display_name || player.name).slice(0, 1))}</span>
+                <span class="avatar-cape"></span>
+                <span class="avatar-body"></span>
+                <span class="avatar-boots"></span>
+                ${unlockedKeys.has("full_stop_shield") ? `<span class="avatar-shield"></span>` : ""}
+                ${unlockedKeys.has("sentence_hammer") || unlockedKeys.has("adjective_feather") || unlockedKeys.has("connector_key") ? `<span class="avatar-tool"></span>` : ""}
+              </div>
+              <span class="platform-shadow"></span>
             </div>
           </div>
-        `).join("")}
+          <div class="hero-nameplate">
+            <strong>${escapeHtml(profile?.display_name || player.name)}</strong>
+            <span>${yearLabelForLevel(profile?.level || 1)} - Island ${progressIslandIndex(profileState) + 1} - ${profile?.xp || 0} XP</span>
+          </div>
+          <div class="stat-panel">
+            ${stats.map((stat) => `
+              <div class="stat-row">
+                <span>${escapeHtml(stat.label)}</span>
+                <i style="--stat: ${stat.value}%;"></i>
+                <strong>${stat.value}</strong>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        <div class="equipment-bag">
+          <div class="bag-tabs">
+            <strong>Bag</strong>
+            <span>${unlocked.length} equipped</span>
+          </div>
+          <div class="item-grid">
+            ${inventory.map((item) => `
+              <button class="item-card ${item.unlocked ? "unlocked" : "locked"}" type="button" title="${escapeHtml(item.name)}">
+                ${toolImage({
+                  key: item.key,
+                  name: item.name,
+                  assetPath: item.asset_path,
+                  locked: !item.unlocked
+                })}
+                <span>${escapeHtml(item.name)}</span>
+              </button>
+            `).join("")}
+          </div>
+        </div>
       </div>
     </section>
   `;
@@ -702,6 +726,51 @@ function progressPercentFor(profileState) {
     return criterion.unlock_item_key && unlockedKeys.has(criterion.unlock_item_key);
   }).length;
   return Math.round((unlockedCriteriaCount / state.criteria.length) * 100);
+}
+
+function equipmentSlotsFor(inventory) {
+  const byKey = new Map(inventory.map((item) => [item.key, item]));
+  return [
+    { key: "capital_spark", label: "Head", side: "left", item: byKey.get("capital_spark") },
+    { key: "full_stop_shield", label: "Shield", side: "left", item: byKey.get("full_stop_shield") },
+    { key: "space_boots", label: "Boots", side: "left", item: byKey.get("space_boots") },
+    { key: "sentence_hammer", label: "Tool", side: "right", item: byKey.get("sentence_hammer") },
+    { key: "adjective_feather", label: "Charm", side: "right", item: byKey.get("adjective_feather") },
+    { key: "connector_key", label: "Key", side: "right", item: byKey.get("connector_key") }
+  ];
+}
+
+function equipmentSlotHtml(slot, unlockedKeys) {
+  const item = slot.item;
+  const unlocked = item && unlockedKeys.has(slot.key);
+  return `
+    <div class="equip-slot ${slot.side} ${unlocked ? "equipped" : "locked"}" data-slot="${escapeHtml(slot.label)}">
+      ${item ? toolImage({
+        key: item.key,
+        name: item.name,
+        assetPath: item.asset_path,
+        locked: !unlocked
+      }) : `<span class="tool-fallback">?</span>`}
+      <small>${escapeHtml(slot.label)}</small>
+    </div>
+  `;
+}
+
+function writingStatsFor(profileState) {
+  const inventory = profileState?.inventory || [];
+  const unlockedKeys = new Set(inventory.filter((item) => item.unlocked).map((item) => item.key));
+  return [
+    { label: "Sentence", value: statValue(unlockedKeys, ["capital_spark", "full_stop_shield", "sentence_hammer"]) },
+    { label: "Flow", value: statValue(unlockedKeys, ["connector_key", "space_boots"]) },
+    { label: "Vocabulary", value: statValue(unlockedKeys, ["adjective_feather"]) },
+    { label: "Accuracy", value: Math.min(100, 20 + progressPercentFor(profileState)) }
+  ];
+}
+
+function statValue(unlockedKeys, keys) {
+  if (!keys.length) return 20;
+  const matches = keys.filter((key) => unlockedKeys.has(key)).length;
+  return Math.round(20 + (matches / keys.length) * 80);
 }
 
 async function normalizeImageFile(file) {
