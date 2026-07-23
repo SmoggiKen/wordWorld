@@ -310,32 +310,45 @@ function islandDetailHtml(index) {
   const criterion = state.criteria[index];
   if (!criterion) return "";
   return `
-    <p class="eyebrow">Lesson Island</p>
-    <div class="detail-title island-modal-title">
-      ${toolImage({
-        key: criterion.unlock_item_key || criterion.key,
-        name: criterion.unlock_item_name || criterion.label,
-        assetPath: criterion.unlock_asset_path
-      })}
-      <div>
-        <h2 id="islandModalTitle">${escapeHtml(criterion.label)}</h2>
-        <p class="muted">Challenge ${index + 1} - +${criterion.xp_reward} XP</p>
+    <section class="quest-panel island-quest-panel">
+      <header class="quest-panel-header" id="islandModalTitle">Lesson Island</header>
+      <div class="quest-panel-body">
+        <div class="quest-row quest-row-hero">
+          <span class="quest-row-icon">
+            ${toolImage({
+              key: criterion.unlock_item_key || criterion.key,
+              name: criterion.unlock_item_name || criterion.label,
+              assetPath: criterion.unlock_asset_path
+            })}
+          </span>
+          <div class="quest-row-copy">
+            <strong>${escapeHtml(criterion.label)}</strong>
+            <small>Challenge ${index + 1} - +${criterion.xp_reward} XP</small>
+          </div>
+        </div>
+        <div class="quest-row">
+          <span class="quest-row-icon quest-row-letter">?</span>
+          <div class="quest-row-copy">
+            <strong>Objective</strong>
+            <small>${escapeHtml(criterion.prompt_text)}</small>
+          </div>
+        </div>
+        <div class="quest-row">
+          <span class="quest-row-icon quest-row-letter">+</span>
+          <div class="quest-row-copy">
+            <strong>Unlocks</strong>
+            <small>${escapeHtml(criterion.unlock_item_name || "Writing tool")}</small>
+          </div>
+        </div>
+        <div class="quest-row">
+          <span class="quest-row-icon quest-row-letter">P</span>
+          <div class="quest-row-copy">
+            <strong>Current Player</strong>
+            <small>${escapeHtml(state.profile?.display_name || "Select a player")}</small>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="objective-outline island-objective">
-      <strong>Objective</strong>
-      <p>${escapeHtml(criterion.prompt_text)}</p>
-    </div>
-    <div class="island-modal-grid">
-      <div class="detail-list">
-        <strong>Unlocks</strong>
-        <span>${escapeHtml(criterion.unlock_item_name || "Writing tool")}</span>
-      </div>
-      <div class="detail-list">
-        <strong>Current Player</strong>
-        <span>${escapeHtml(state.profile?.display_name || "Select a player")}</span>
-      </div>
-    </div>
+    </section>
   `;
 }
 
@@ -344,31 +357,43 @@ function playerDetailHtml(player, profileState) {
   const unlocked = profileState?.inventory.filter((item) => item.unlocked) || [];
   const locked = profileState?.inventory.filter((item) => !item.unlocked) || [];
   return `
-    <p class="eyebrow">Selected Player</p>
-    <div class="detail-title">
-      ${playerToken(player, profile?.display_name)}
-      <div>
-        <h2 id="inventoryModalTitle">${escapeHtml(profile?.display_name || player.name)}</h2>
-        <p class="muted">${yearLabelForLevel(profile?.level || 1)} - Island ${progressIslandIndex(profileState) + 1} - ${profile?.xp || 0} XP</p>
-      </div>
-    </div>
-    <div class="inventory-heading">
-      <strong>Inventory</strong>
-      <span>${unlocked.length}/${unlocked.length + locked.length} tools unlocked</span>
-    </div>
-    <div class="inventory-popover-grid">
-      ${[...unlocked, ...locked].map((item) => `
-        <div class="mini-tool ${item.unlocked ? "" : "locked"}">
-          ${toolImage({
-            key: item.key,
-            name: item.name,
-            assetPath: item.asset_path,
-            locked: !item.unlocked
-          })}
-          <span>${escapeHtml(item.name)}</span>
+    <section class="quest-panel player-quest-panel">
+      <header class="quest-panel-header" id="inventoryModalTitle">Player Inventory</header>
+      <div class="quest-panel-body">
+        <div class="quest-row quest-row-hero">
+          <span class="quest-row-icon player-quest-token">
+            ${playerToken(player, profile?.display_name)}
+          </span>
+          <div class="quest-row-copy">
+            <strong>${escapeHtml(profile?.display_name || player.name)}</strong>
+            <small>${yearLabelForLevel(profile?.level || 1)} - Island ${progressIslandIndex(profileState) + 1} - ${profile?.xp || 0} XP</small>
+          </div>
         </div>
-      `).join("")}
-    </div>
+        <div class="quest-row quest-row-summary">
+          <span class="quest-row-icon quest-row-letter">I</span>
+          <div class="quest-row-copy">
+            <strong>Inventory</strong>
+            <small>${unlocked.length}/${unlocked.length + locked.length} tools unlocked</small>
+          </div>
+        </div>
+        ${[...unlocked, ...locked].map((item) => `
+          <div class="quest-row ${item.unlocked ? "" : "locked"}">
+            <span class="quest-row-icon">
+              ${toolImage({
+                key: item.key,
+                name: item.name,
+                assetPath: item.asset_path,
+                locked: !item.unlocked
+              })}
+            </span>
+            <div class="quest-row-copy">
+              <strong>${escapeHtml(item.name)}</strong>
+              <small>${item.unlocked ? "Tool unlocked" : "Locked tool"}</small>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    </section>
   `;
 }
 
