@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Word World</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">Write - Scan - Celebrate</p>
+          <h1>Word World</h1>
+        </div>
+        <div class="level-pill">
+          <span id="level">Level 1</span>
+          <strong id="xp">0 XP</strong>
+        </div>
+      </section>
+
+      <section class="writer-panel">
+        <div class="avatar" aria-hidden="true">
+          <div class="avatar-face"></div>
+          <div class="avatar-body"></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span id="writerName">Explorer</span>
+            <span id="nextLevel">100 XP to Level 2</span>
+          </div>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+      </section>
+
+      <nav class="tabs" aria-label="Main sections">
+        <button class="tab active" data-view="scan">Scan</button>
+        <button class="tab" data-view="rewards">Rewards</button>
+        <button class="tab" data-view="inventory">Inventory</button>
+      </nav>
+
+      <section id="scanView" class="view active">
+        <div class="scan-grid">
+          <div class="scan-panel">
+            <h2>Scan writing</h2>
+            <p class="muted">Take a photo of a handwritten sentence. The app looks for positive features and unlocks progress.</p>
+            <form id="scanForm">
+              <label class="upload-box">
+                <input id="imageInput" name="image" type="file" accept="image/*" capture="environment" required />
+                <span>Choose or take photo</span>
+              </label>
+              <img id="preview" class="preview" alt="Writing preview" hidden />
+              <button class="primary-button" type="submit">Start Adventure</button>
+            </form>
+          </div>
+
+          <div class="scan-panel checks-panel">
+            <h2>Today's writing tools</h2>
+            <div id="criteriaList" class="criteria-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="rewardsView" class="view">
+        <div class="reward-stage">
+          <h2>Celebration</h2>
+          <div id="rewardCards" class="reward-cards">
+            <p class="empty-state">Scan a sentence to see rewards here.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="inventoryView" class="view">
+        <div class="inventory-header">
+          <h2>Inventory</h2>
+          <p class="muted">Unlocked tools show what your writer has learned.</p>
+        </div>
+        <div id="inventoryGrid" class="inventory-grid"></div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" hidden></div>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
