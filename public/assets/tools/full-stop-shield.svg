@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title desc" shape-rendering="crispEdges">
+  <title id="title">Full Stop Shield</title>
+  <desc id="desc">A pixel-art blue shield marked with a full stop.</desc>
+  <rect width="64" height="64" fill="none"/>
+  <rect x="14" y="8" width="36" height="8" fill="#244a86"/>
+  <rect x="10" y="16" width="44" height="10" fill="#2d6cdf"/>
+  <rect x="12" y="26" width="40" height="10" fill="#3d7ff0"/>
+  <rect x="16" y="36" width="32" height="8" fill="#2fbf71"/>
+  <rect x="22" y="44" width="20" height="8" fill="#24975a"/>
+  <rect x="28" y="52" width="8" height="6" fill="#1d7447"/>
+  <rect x="26" y="25" width="12" height="12" fill="#ffffff"/>
+  <rect x="30" y="29" width="4" height="4" fill="#17202a"/>
+</svg>

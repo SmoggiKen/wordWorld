@@ -73,7 +73,11 @@ function renderProfile() {
 function renderCriteria() {
   els.criteriaList.innerHTML = state.criteria.map((criterion) => `
     <div class="criterion">
-      <div class="criterion-icon">${iconFor(criterion.key)}</div>
+      <div class="criterion-icon">${toolImage({
+        key: criterion.unlock_item_key || criterion.key,
+        name: criterion.unlock_item_name || criterion.label,
+        assetPath: criterion.unlock_asset_path
+      })}</div>
       <div>
         <strong>${escapeHtml(criterion.label)}</strong>
         <small>${escapeHtml(criterion.prompt_text)}</small>
@@ -86,7 +90,12 @@ function renderCriteria() {
 function renderInventory() {
   els.inventoryGrid.innerHTML = state.inventory.map((item) => `
     <div class="inventory-item ${item.unlocked ? "" : "locked"}">
-      <div class="inventory-icon">${item.unlocked ? iconFor(item.key) : "?"}</div>
+      <div class="inventory-icon">${toolImage({
+        key: item.key,
+        name: item.name,
+        assetPath: item.asset_path,
+        locked: !item.unlocked
+      })}</div>
       <div>
         <strong>${escapeHtml(item.name)}</strong>
         <p class="muted">${escapeHtml(item.description)}</p>
@@ -103,7 +112,11 @@ function renderRewards() {
 
   els.rewardCards.innerHTML = state.lastRewards.map((reward) => `
     <div class="reward-card">
-      <strong>${iconFor(reward.key)} ${escapeHtml(reward.label)}</strong>
+      <strong>${toolImage({
+        key: reward.unlockItemKey || reward.key,
+        name: reward.label,
+        assetPath: assetPathFor(reward.unlockItemKey || reward.key)
+      })} ${escapeHtml(reward.label)}</strong>
       <span>+${reward.xpAwarded} XP</span>
     </div>
   `).join("");
@@ -170,22 +183,28 @@ function showToast(message) {
   }, 3200);
 }
 
-function iconFor(key) {
-  const icons = {
-    capital_letter: "A",
-    capital_spark: "A",
-    full_stop: ".",
-    full_stop_shield: ".",
-    complete_sentence: "+",
-    sentence_hammer: "+",
-    visible_spaces: "_",
-    space_boots: "_",
-    adjective: "*",
-    adjective_feather: "*",
-    because: "&",
-    connector_key: "&"
+function toolImage({ key, name, assetPath, locked = false }) {
+  const src = assetPath || assetPathFor(key);
+  if (!src) return `<span class="tool-fallback">${locked ? "?" : "+"}</span>`;
+
+  return `<img
+    class="tool-image"
+    src="${escapeHtml(src)}"
+    alt="${locked ? "Locked tool" : escapeHtml(name || "Writing tool")}"
+    loading="lazy"
+  />`;
+}
+
+function assetPathFor(key) {
+  const paths = {
+    capital_spark: "/assets/tools/capital-spark.svg",
+    full_stop_shield: "/assets/tools/full-stop-shield.svg",
+    sentence_hammer: "/assets/tools/sentence-hammer.svg",
+    space_boots: "/assets/tools/space-boots.svg",
+    adjective_feather: "/assets/tools/adjective-feather.svg",
+    connector_key: "/assets/tools/connector-key.svg"
   };
-  return icons[key] || "+";
+  return paths[key] || null;
 }
 
 function escapeHtml(value) {

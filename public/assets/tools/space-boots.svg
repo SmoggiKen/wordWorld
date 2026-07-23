@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title desc" shape-rendering="crispEdges">
+  <title id="title">Finger Space Boots</title>
+  <desc id="desc">A pair of pixel-art boots for keeping spaces between words.</desc>
+  <rect width="64" height="64" fill="none"/>
+  <rect x="12" y="14" width="14" height="26" fill="#2d6cdf"/>
+  <rect x="38" y="14" width="14" height="26" fill="#2d6cdf"/>
+  <rect x="10" y="40" width="22" height="10" fill="#244a86"/>
+  <rect x="34" y="40" width="22" height="10" fill="#244a86"/>
+  <rect x="8" y="50" width="26" height="6" fill="#17202a"/>
+  <rect x="32" y="50" width="26" height="6" fill="#17202a"/>
+  <rect x="16" y="18" width="6" height="18" fill="#65a3ff"/>
+  <rect x="42" y="18" width="6" height="18" fill="#65a3ff"/>
+  <rect x="28" y="28" width="8" height="6" fill="#ffd166"/>
+</svg>

@@ -8,12 +8,12 @@ export const pool = new Pool({
 });
 
 const defaultInventoryItems = [
-  ["sentence_hammer", "Sentence Hammer", "A sturdy tool for building complete sentences."],
-  ["capital_spark", "Capital Spark", "A bright spark for starting sentences strongly."],
-  ["full_stop_shield", "Full Stop Shield", "A shield that protects the end of a sentence."],
-  ["space_boots", "Finger Space Boots", "Boots that help words stand apart."],
-  ["adjective_feather", "Adjective Feather", "A feather for adding detail and description."],
-  ["connector_key", "Connector Key", "A key for joining ideas with because."]
+  ["sentence_hammer", "Sentence Hammer", "A sturdy tool for building complete sentences.", "/assets/tools/sentence-hammer.svg"],
+  ["capital_spark", "Capital Spark", "A bright spark for starting sentences strongly.", "/assets/tools/capital-spark.svg"],
+  ["full_stop_shield", "Full Stop Shield", "A shield that protects the end of a sentence.", "/assets/tools/full-stop-shield.svg"],
+  ["space_boots", "Finger Space Boots", "Boots that help words stand apart.", "/assets/tools/space-boots.svg"],
+  ["adjective_feather", "Adjective Feather", "A feather for adding detail and description.", "/assets/tools/adjective-feather.svg"],
+  ["connector_key", "Connector Key", "A key for joining ideas with because.", "/assets/tools/connector-key.svg"]
 ];
 
 const defaultCriteria = [
@@ -43,6 +43,7 @@ export async function initializeDatabase() {
       key text UNIQUE NOT NULL,
       name text NOT NULL,
       description text NOT NULL,
+      asset_path text,
       created_at timestamptz NOT NULL DEFAULT now()
     );
 
@@ -86,13 +87,17 @@ export async function initializeDatabase() {
       unlocked_at timestamptz NOT NULL DEFAULT now(),
       PRIMARY KEY (profile_id, inventory_item_id)
     );
+
+    ALTER TABLE inventory_items
+      ADD COLUMN IF NOT EXISTS asset_path text;
   `);
 
   for (const item of defaultInventoryItems) {
     await pool.query(
-      `INSERT INTO inventory_items (key, name, description)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (key) DO NOTHING`,
+      `INSERT INTO inventory_items (key, name, description, asset_path)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (key) DO UPDATE SET
+         asset_path = COALESCE(inventory_items.asset_path, EXCLUDED.asset_path)`,
       item
     );
   }
@@ -109,7 +114,14 @@ export async function initializeDatabase() {
 
 export async function getActiveCriteria() {
   const result = await pool.query(
-    `SELECT * FROM scan_criteria WHERE active = true ORDER BY sort_order ASC, label ASC`
+    `SELECT
+       sc.*,
+       ii.name AS unlock_item_name,
+       ii.asset_path AS unlock_asset_path
+     FROM scan_criteria sc
+     LEFT JOIN inventory_items ii ON ii.key = sc.unlock_item_key
+     WHERE sc.active = true
+     ORDER BY sc.sort_order ASC, sc.label ASC`
   );
   return result.rows;
 }
@@ -123,6 +135,7 @@ export async function getProfileState(profileId) {
       ii.key,
       ii.name,
       ii.description,
+      ii.asset_path,
       pii.unlocked_at IS NOT NULL AS unlocked,
       pii.unlocked_at
     FROM inventory_items ii

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title desc" shape-rendering="crispEdges">
+  <title id="title">Connector Key</title>
+  <desc id="desc">A golden pixel-art key for connecting ideas with because.</desc>
+  <rect width="64" height="64" fill="none"/>
+  <rect x="8" y="22" width="18" height="18" fill="#ffd166"/>
+  <rect x="12" y="26" width="10" height="10" fill="#ffffff"/>
+  <rect x="16" y="30" width="4" height="4" fill="#17202a"/>
+  <rect x="26" y="28" width="24" height="8" fill="#ffd166"/>
+  <rect x="48" y="28" width="8" height="8" fill="#d99a3a"/>
+  <rect x="52" y="36" width="6" height="8" fill="#d99a3a"/>
+  <rect x="40" y="36" width="6" height="8" fill="#b87933"/>
+  <rect x="8" y="40" width="10" height="4" fill="#d99a3a"/>
+  <rect x="12" y="18" width="10" height="4" fill="#ffe066"/>
+</svg>

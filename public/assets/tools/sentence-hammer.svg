@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title desc" shape-rendering="crispEdges">
+  <title id="title">Sentence Hammer</title>
+  <desc id="desc">A pixel-art hammer for building complete sentences.</desc>
+  <rect width="64" height="64" fill="none"/>
+  <rect x="12" y="14" width="32" height="10" fill="#7a8798"/>
+  <rect x="44" y="18" width="8" height="8" fill="#5c6778"/>
+  <rect x="8" y="24" width="12" height="8" fill="#5c6778"/>
+  <rect x="28" y="24" width="10" height="8" fill="#8b5a2b"/>
+  <rect x="34" y="30" width="10" height="10" fill="#9c6a3a"/>
+  <rect x="40" y="38" width="10" height="10" fill="#b87933"/>
+  <rect x="46" y="46" width="8" height="10" fill="#6b3f1d"/>
+  <rect x="18" y="10" width="20" height="4" fill="#aab4c0"/>
+  <rect x="30" y="18" width="8" height="4" fill="#dce4ec"/>
+</svg>
