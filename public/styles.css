@@ -435,6 +435,7 @@ h2 {
 
 .player-layer {
   z-index: 18;
+  pointer-events: none;
 }
 
 .map-player {
@@ -449,12 +450,15 @@ h2 {
   background: transparent;
   cursor: grab;
   touch-action: none;
+  pointer-events: auto;
+  transition: left 280ms cubic-bezier(0.2, 0.8, 0.2, 1), top 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .map-player.dragging {
   z-index: 80;
   cursor: grabbing;
   animation: token-wriggle 340ms ease-in-out infinite;
+  transition: none;
 }
 
 .player-head {
@@ -499,10 +503,10 @@ h2 {
 
 .detail-panel {
   position: absolute;
-  z-index: 12;
-  left: 360px;
-  bottom: 26px;
-  width: min(420px, calc(100% - 720px));
+  z-index: 30;
+  right: 32px;
+  bottom: 32px;
+  width: min(380px, calc(100% - 370px));
   min-height: 190px;
   max-height: 260px;
   overflow: auto;
@@ -519,6 +523,20 @@ h2 {
   gap: 12px;
   align-items: center;
   margin-bottom: 12px;
+}
+
+.detail-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+  cursor: pointer;
+  font-weight: 1000;
 }
 
 .detail-title .tool-image {
@@ -538,6 +556,26 @@ h2 {
   padding: 10px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.08);
+}
+
+.objective-outline {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid rgba(35, 240, 208, 0.22);
+  border-radius: 8px;
+  background: rgba(35, 240, 208, 0.08);
+}
+
+.objective-outline strong {
+  color: var(--yellow);
+}
+
+.objective-outline p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.35;
 }
 
 .inventory-popover-grid {

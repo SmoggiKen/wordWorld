@@ -264,6 +264,7 @@ function renderIslandDetail(index) {
   if (!criterion) return;
   els.detailPanel.hidden = false;
   els.detailPanel.innerHTML = `
+    <button class="detail-close" type="button" data-action="close-detail" aria-label="Close objective">x</button>
     <p class="eyebrow">Lesson Island</p>
     <div class="detail-title">
       ${toolImage({
@@ -276,7 +277,10 @@ function renderIslandDetail(index) {
         <p class="muted">+${criterion.xp_reward} XP</p>
       </div>
     </div>
-    <p>${escapeHtml(criterion.prompt_text)}</p>
+    <div class="objective-outline">
+      <strong>Objective</strong>
+      <p>${escapeHtml(criterion.prompt_text)}</p>
+    </div>
     <div class="detail-list">
       <strong>Unlocks</strong>
       <span>${escapeHtml(criterion.unlock_item_name || "Writing tool")}</span>
@@ -409,6 +413,11 @@ els.islandMap.addEventListener("click", (event) => {
 });
 
 els.detailPanel.addEventListener("click", (event) => {
+  if (event.target.closest("[data-action='close-detail']")) {
+    els.detailPanel.hidden = true;
+    return;
+  }
+
   const button = event.target.closest("[data-action='open-inventory']");
   if (!button) return;
   openInventoryModal();
@@ -467,6 +476,9 @@ els.playerLayer.addEventListener("pointermove", (event) => {
 els.playerLayer.addEventListener("pointerup", finishDrag);
 els.playerLayer.addEventListener("pointercancel", finishDrag);
 
+document.addEventListener("pointerup", finishDrag);
+document.addEventListener("pointercancel", finishDrag);
+
 els.playerLayer.addEventListener("mousedown", (event) => {
   if (state.dragging) return;
   const token = event.target.closest("[data-profile-id]");
@@ -523,11 +535,14 @@ function updateSelectedTokenPosition(clientX, clientY, rect, profileId = state.p
 }
 
 function completeDrag() {
-  const token = els.playerLayer.querySelector(`[data-profile-id="${cssEscape(state.dragging.profileId)}"]`);
+  const profileId = state.dragging.profileId;
+  const token = els.playerLayer.querySelector(`[data-profile-id="${cssEscape(profileId)}"]`);
   token?.classList.remove("dragging");
+  snapTokenToNearestIsland(profileId);
+  applyTokenPosition(profileId);
+  updateActiveTokenClasses();
   saveTokenPositions();
   saveTokenStack();
-  renderPlayers();
   renderRoster();
   state.dragging = null;
 }
@@ -540,6 +555,55 @@ function moveCurrentPlayerToProgress() {
     y: clamp(pos.y + 8, 6, 94)
   };
   saveTokenPositions();
+}
+
+function snapTokenToNearestIsland(profileId) {
+  const current = state.tokenPositions[profileId];
+  if (!current || !islandPositions.length) return;
+
+  let nearestIndex = 0;
+  let nearestDistance = Infinity;
+  islandPositions.forEach((island, index) => {
+    const distance = ((current.x - island.x) ** 2) + ((current.y - island.y) ** 2);
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestIndex = index;
+    }
+  });
+
+  const offset = snapOffsetFor(profileId);
+  const island = islandPositions[nearestIndex];
+  state.tokenPositions[profileId] = {
+    x: clamp(island.x + offset.x, 4, 96),
+    y: clamp(island.y + offset.y, 6, 94)
+  };
+}
+
+function snapOffsetFor(profileId) {
+  const index = Math.max(0, state.roster.findIndex((player) => player.id === profileId));
+  const offsets = [
+    { x: -5, y: 11 },
+    { x: 5, y: 11 },
+    { x: -1, y: 15 },
+    { x: 8, y: 15 },
+    { x: -8, y: 15 }
+  ];
+  return offsets[index % offsets.length];
+}
+
+function applyTokenPosition(profileId) {
+  const pos = state.tokenPositions[profileId];
+  const token = els.playerLayer.querySelector(`[data-profile-id="${cssEscape(profileId)}"]`);
+  if (!pos || !token) return;
+  token.style.setProperty("--x", pos.x);
+  token.style.setProperty("--y", pos.y);
+}
+
+function updateActiveTokenClasses() {
+  const tokens = els.playerLayer.querySelectorAll("[data-profile-id]");
+  for (const token of tokens) {
+    token.classList.toggle("active", token.dataset.profileId === state.profileId);
+  }
 }
 
 function progressIslandIndex(profileState) {
