@@ -23,6 +23,7 @@ const state = {
   roster: [],
   groupStates: new Map(),
   tokenPositions: readJson("wordWorldTokenPositions", {}),
+  tokenStack: readJson("wordWorldTokenStack", []),
   inventoryOpen: false,
   dragging: null
 };
@@ -131,7 +132,15 @@ function seedTokenPositions() {
       state.tokenPositions[player.id] = { x: player.x, y: player.y };
     }
   }
+  const rosterIds = new Set(state.roster.map((player) => player.id));
+  state.tokenStack = state.tokenStack.filter((profileId) => rosterIds.has(profileId));
+  for (const player of state.roster) {
+    if (!state.tokenStack.includes(player.id)) {
+      state.tokenStack.push(player.id);
+    }
+  }
   saveTokenPositions();
+  saveTokenStack();
 }
 
 function render() {
@@ -192,7 +201,7 @@ function renderPlayers() {
         class="map-player ${active ? "active" : ""}"
         type="button"
         data-profile-id="${escapeHtml(player.id)}"
-        style="--x: ${pos.x}; --y: ${pos.y}; --player-color: ${escapeHtml(player.color)}"
+        style="--x: ${pos.x}; --y: ${pos.y}; --player-color: ${escapeHtml(player.color)}; --stack-index: ${stackIndexFor(player.id)};"
         aria-label="${escapeHtml(profile?.display_name || player.name)}"
       >
         <span class="player-head">${escapeHtml((profile?.display_name || player.name).slice(0, 1))}</span>
@@ -422,6 +431,7 @@ els.playerLayer.addEventListener("pointerdown", (event) => {
   if (!token) return;
   const profileId = token.dataset.profileId;
   setCurrentProfile(profileId);
+  promoteToken(profileId);
   renderDetailForCurrentPlayer();
   renderInventoryModal();
   token.setPointerCapture(event.pointerId);
@@ -452,6 +462,7 @@ els.playerLayer.addEventListener("mousedown", (event) => {
   if (!token || event.button !== 0) return;
   const profileId = token.dataset.profileId;
   setCurrentProfile(profileId);
+  promoteToken(profileId);
   renderDetailForCurrentPlayer();
   renderInventoryModal();
   state.dragging = { profileId, rect: els.questMap.getBoundingClientRect(), mode: "mouse" };
@@ -504,6 +515,7 @@ function completeDrag() {
   const token = els.playerLayer.querySelector(`[data-profile-id="${cssEscape(state.dragging.profileId)}"]`);
   token?.classList.remove("dragging");
   saveTokenPositions();
+  saveTokenStack();
   renderPlayers();
   renderRoster();
   state.dragging = null;
@@ -545,6 +557,21 @@ function progressPercentFor(profileState) {
   return Math.round((unlockedCriteriaCount / state.criteria.length) * 100);
 }
 
+function promoteToken(profileId) {
+  state.tokenStack = state.tokenStack.filter((item) => item !== profileId);
+  state.tokenStack.push(profileId);
+  const tokens = els.playerLayer.querySelectorAll("[data-profile-id]");
+  for (const token of tokens) {
+    token.style.setProperty("--stack-index", stackIndexFor(token.dataset.profileId));
+  }
+  saveTokenStack();
+}
+
+function stackIndexFor(profileId) {
+  const index = state.tokenStack.indexOf(profileId);
+  return index === -1 ? 0 : index;
+}
+
 function toolImage({ key, name, assetPath, locked = false }) {
   const src = assetPath || assetPathFor(key);
   if (!src) return `<span class="tool-fallback">${locked ? "?" : "+"}</span>`;
@@ -583,6 +610,10 @@ function readJson(key, fallback) {
 
 function saveTokenPositions() {
   localStorage.setItem("wordWorldTokenPositions", JSON.stringify(state.tokenPositions));
+}
+
+function saveTokenStack() {
+  localStorage.setItem("wordWorldTokenStack", JSON.stringify(state.tokenStack));
 }
 
 function showToast(message) {

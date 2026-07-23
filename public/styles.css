@@ -434,12 +434,12 @@ h2 {
 }
 
 .player-layer {
-  z-index: 6;
+  z-index: 18;
 }
 
 .map-player {
   position: absolute;
-  z-index: 8;
+  z-index: calc(20 + var(--stack-index));
   left: calc(var(--x) * 1%);
   top: calc(var(--y) * 1%);
   width: 54px;
@@ -452,7 +452,7 @@ h2 {
 }
 
 .map-player.dragging {
-  z-index: 20;
+  z-index: 80;
   cursor: grabbing;
   animation: token-wriggle 340ms ease-in-out infinite;
 }
