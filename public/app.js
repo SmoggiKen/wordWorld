@@ -37,6 +37,8 @@ const state = {
   tokenStack: readJson("wordWorldTokenStack", []),
   scanFile: null,
   inventoryOpen: false,
+  islandOpen: false,
+  islandModalIndex: null,
   dragging: null,
   snapPreviewIndex: null
 };
@@ -59,6 +61,9 @@ const els = {
   inventoryModal: document.querySelector("#inventoryModal"),
   inventoryModalContent: document.querySelector("#inventoryModalContent"),
   closeInventoryModal: document.querySelector("#closeInventoryModal"),
+  islandModal: document.querySelector("#islandModal"),
+  islandModalContent: document.querySelector("#islandModalContent"),
+  closeIslandModal: document.querySelector("#closeIslandModal"),
   toast: document.querySelector("#toast")
 };
 
@@ -301,6 +306,39 @@ function renderIslandDetail(index) {
   `;
 }
 
+function islandDetailHtml(index) {
+  const criterion = state.criteria[index];
+  if (!criterion) return "";
+  return `
+    <p class="eyebrow">Lesson Island</p>
+    <div class="detail-title island-modal-title">
+      ${toolImage({
+        key: criterion.unlock_item_key || criterion.key,
+        name: criterion.unlock_item_name || criterion.label,
+        assetPath: criterion.unlock_asset_path
+      })}
+      <div>
+        <h2 id="islandModalTitle">${escapeHtml(criterion.label)}</h2>
+        <p class="muted">Challenge ${index + 1} - +${criterion.xp_reward} XP</p>
+      </div>
+    </div>
+    <div class="objective-outline island-objective">
+      <strong>Objective</strong>
+      <p>${escapeHtml(criterion.prompt_text)}</p>
+    </div>
+    <div class="island-modal-grid">
+      <div class="detail-list">
+        <strong>Unlocks</strong>
+        <span>${escapeHtml(criterion.unlock_item_name || "Writing tool")}</span>
+      </div>
+      <div class="detail-list">
+        <strong>Current Player</strong>
+        <span>${escapeHtml(state.profile?.display_name || "Select a player")}</span>
+      </div>
+    </div>
+  `;
+}
+
 function playerDetailHtml(player, profileState) {
   const profile = profileState?.profile;
   const unlocked = profileState?.inventory.filter((item) => item.unlocked) || [];
@@ -338,14 +376,14 @@ function openInventoryModal() {
   state.inventoryOpen = true;
   renderInventoryModal();
   els.inventoryModal.hidden = false;
-  document.body.classList.add("modal-open");
+  syncModalOpenState();
   els.closeInventoryModal.focus();
 }
 
 function closeInventoryModal() {
   state.inventoryOpen = false;
   els.inventoryModal.hidden = true;
-  document.body.classList.remove("modal-open");
+  syncModalOpenState();
 }
 
 function renderInventoryModal() {
@@ -354,6 +392,28 @@ function renderInventoryModal() {
   if (!player) return closeInventoryModal();
   const profileState = state.groupStates.get(player.id);
   els.inventoryModalContent.innerHTML = playerDetailHtml(player, profileState);
+}
+
+function openIslandModal(index) {
+  const criterion = state.criteria[index];
+  if (!criterion) return;
+  state.islandOpen = true;
+  state.islandModalIndex = index;
+  els.islandModalContent.innerHTML = islandDetailHtml(index);
+  els.islandModal.hidden = false;
+  syncModalOpenState();
+  els.closeIslandModal.focus();
+}
+
+function closeIslandModal() {
+  state.islandOpen = false;
+  state.islandModalIndex = null;
+  els.islandModal.hidden = true;
+  syncModalOpenState();
+}
+
+function syncModalOpenState() {
+  document.body.classList.toggle("modal-open", state.inventoryOpen || state.islandOpen);
 }
 
 els.imageInput.addEventListener("change", async () => {
@@ -422,7 +482,9 @@ els.islandMap.addEventListener("focusin", (event) => {
 els.islandMap.addEventListener("click", (event) => {
   const island = event.target.closest("[data-island-index]");
   if (!island) return;
-  renderIslandDetail(Number(island.dataset.islandIndex));
+  const islandIndex = Number(island.dataset.islandIndex);
+  renderIslandDetail(islandIndex);
+  openIslandModal(islandIndex);
 });
 
 els.detailPanel.addEventListener("click", (event) => {
@@ -511,13 +573,20 @@ document.addEventListener("mouseup", () => {
 });
 
 els.closeInventoryModal.addEventListener("click", closeInventoryModal);
+els.closeIslandModal.addEventListener("click", closeIslandModal);
 
 els.inventoryModal.addEventListener("click", (event) => {
   if (event.target === els.inventoryModal) closeInventoryModal();
 });
 
+els.islandModal.addEventListener("click", (event) => {
+  if (event.target === els.islandModal) closeIslandModal();
+});
+
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && state.inventoryOpen) closeInventoryModal();
+  if (event.key !== "Escape") return;
+  if (state.inventoryOpen) closeInventoryModal();
+  if (state.islandOpen) closeIslandModal();
 });
 
 function finishDrag(event) {
