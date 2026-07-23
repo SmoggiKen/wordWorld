@@ -36,8 +36,9 @@ const els = {
   playerLayer: document.querySelector("#playerLayer"),
   playerRoster: document.querySelector("#playerRoster"),
   detailPanel: document.querySelector("#detailPanel"),
-  assessmentDock: document.querySelector(".assessment-dock"),
+  playerActionDock: document.querySelector(".player-action-dock"),
   rewardCards: document.querySelector("#rewardCards"),
+  modalRewardCards: document.querySelector("#modalRewardCards"),
   scanForm: document.querySelector("#scanForm"),
   imageInput: document.querySelector("#imageInput"),
   uploadLabel: document.querySelector("#uploadLabel"),
@@ -222,12 +223,7 @@ function renderRoster() {
 }
 
 function renderRewards() {
-  if (!state.lastRewards.length) {
-    els.rewardCards.innerHTML = `<p class="empty-state">No rewards yet.</p>`;
-    return;
-  }
-
-  els.rewardCards.innerHTML = state.lastRewards.map((reward) => `
+  const html = state.lastRewards.length ? state.lastRewards.map((reward) => `
     <div class="reward-card">
       <strong>${toolImage({
         key: reward.unlockItemKey || reward.key,
@@ -236,39 +232,20 @@ function renderRewards() {
       })} ${escapeHtml(reward.label)}</strong>
       <span>+${reward.xpAwarded} XP</span>
     </div>
-  `).join("");
+  `).join("") : `<p class="empty-state">No rewards yet.</p>`;
+
+  els.rewardCards.innerHTML = html;
+  els.modalRewardCards.innerHTML = html;
 }
 
 function renderDetailForCurrentPlayer() {
-  const player = state.roster.find((item) => item.id === state.profileId);
-  if (!player) return;
-  const profileState = state.groupStates.get(player.id);
-  const profile = profileState?.profile;
-  const unlockedCount = profileState?.inventory.filter((item) => item.unlocked).length || 0;
-  const totalCount = profileState?.inventory.length || 0;
-  const island = progressIslandIndex(profileState) + 1;
-  els.detailPanel.innerHTML = `
-    <p class="eyebrow">Selected Player</p>
-    <div class="detail-title">
-      ${playerToken(player, profile?.display_name)}
-      <div>
-        <h2>${escapeHtml(profile?.display_name || player.name)}</h2>
-        <p class="muted">${yearLabelForLevel(profile?.level || 1)} - Island ${island} - ${profile?.xp || 0} XP</p>
-      </div>
-    </div>
-    <div class="detail-list">
-      <strong>Inventory</strong>
-      <span>${unlockedCount}/${totalCount} tools unlocked</span>
-    </div>
-    <button class="secondary-button inventory-open-button" type="button" data-action="open-inventory">
-      Open Inventory
-    </button>
-  `;
+  els.detailPanel.hidden = true;
 }
 
 function renderIslandDetail(index) {
   const criterion = state.criteria[index];
   if (!criterion) return;
+  els.detailPanel.hidden = false;
   els.detailPanel.innerHTML = `
     <p class="eyebrow">Lesson Island</p>
     <div class="detail-title">
@@ -295,13 +272,17 @@ function playerDetailHtml(player, profileState) {
   const unlocked = profileState?.inventory.filter((item) => item.unlocked) || [];
   const locked = profileState?.inventory.filter((item) => !item.unlocked) || [];
   return `
-    <p class="eyebrow">Player Inventory</p>
+    <p class="eyebrow">Selected Player</p>
     <div class="detail-title">
       ${playerToken(player, profile?.display_name)}
       <div>
         <h2 id="inventoryModalTitle">${escapeHtml(profile?.display_name || player.name)}</h2>
-        <p class="muted">${yearLabelForLevel(profile?.level || 1)} - ${profile?.xp || 0} XP</p>
+        <p class="muted">${yearLabelForLevel(profile?.level || 1)} - Island ${progressIslandIndex(profileState) + 1} - ${profile?.xp || 0} XP</p>
       </div>
+    </div>
+    <div class="inventory-heading">
+      <strong>Inventory</strong>
+      <span>${unlocked.length}/${unlocked.length + locked.length} tools unlocked</span>
     </div>
     <div class="inventory-popover-grid">
       ${[...unlocked, ...locked].map((item) => `
@@ -406,7 +387,7 @@ els.detailPanel.addEventListener("click", (event) => {
   openInventoryModal();
 });
 
-els.assessmentDock.addEventListener("click", (event) => {
+els.playerActionDock.addEventListener("click", (event) => {
   const button = event.target.closest("[data-action='open-inventory']");
   if (!button) return;
   openInventoryModal();

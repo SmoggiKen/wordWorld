@@ -80,9 +80,8 @@ button {
 
 .compass,
 .score-card,
-.assessment-dock,
+.player-action-dock,
 .roster-dock,
-.reward-feed,
 .detail-panel {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -160,7 +159,7 @@ h2 {
 
 .quest-map {
   position: absolute;
-  inset: 116px 340px 156px 340px;
+  inset: 116px 60px 58px 330px;
   min-height: 480px;
   border-radius: 48% 52% 46% 54%;
   background:
@@ -237,6 +236,7 @@ h2 {
 .lesson-island:focus-visible,
 .map-player:focus-visible,
 .player-card:focus-visible,
+.player-action-button:focus-visible,
 .primary-button:focus-visible,
 .secondary-button:focus-visible,
 .modal-close:focus-visible,
@@ -374,6 +374,10 @@ h2 {
   padding: 18px;
 }
 
+.detail-panel[hidden] {
+  display: none;
+}
+
 .detail-title {
   display: grid;
   grid-template-columns: 62px 1fr;
@@ -430,18 +434,43 @@ h2 {
   filter: grayscale(1) opacity(0.55);
 }
 
-.assessment-dock {
+.player-action-dock {
   position: absolute;
   z-index: 12;
   right: 26px;
   top: 150px;
-  width: 300px;
-  padding: 16px;
+  width: 210px;
+  padding: 12px;
 }
 
-.assessment-dock form {
+.player-action-button {
+  width: 100%;
+  min-height: 68px;
   display: grid;
-  gap: 10px;
+  gap: 4px;
+  align-content: center;
+  padding: 12px;
+  border: 1px solid rgba(47, 215, 255, 0.55);
+  border-radius: 8px;
+  background: rgba(47, 215, 255, 0.1);
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+
+.player-action-button span,
+.player-action-button small {
+  display: block;
+}
+
+.player-action-button span {
+  font-weight: 1000;
+  font-size: 1.1rem;
+}
+
+.player-action-button small {
+  color: var(--muted);
+  font-weight: 900;
 }
 
 .upload-chip {
@@ -570,16 +599,6 @@ h2 {
   box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.16);
 }
 
-.reward-feed {
-  position: absolute;
-  z-index: 12;
-  right: 26px;
-  bottom: 26px;
-  width: 300px;
-  min-height: 164px;
-  padding: 16px;
-}
-
 .reward-card {
   display: flex;
   justify-content: space-between;
@@ -657,8 +676,8 @@ h2 {
 
 .inventory-modal {
   position: relative;
-  width: min(760px, 100%);
-  max-height: min(86vh, 720px);
+  width: min(980px, 100%);
+  max-height: min(88vh, 760px);
   overflow: auto;
   padding: 24px;
   border: 1px solid var(--line);
@@ -667,6 +686,18 @@ h2 {
     radial-gradient(circle at 82% 8%, rgba(35, 240, 208, 0.14), transparent 15rem),
     var(--panel-strong);
   box-shadow: 0 28px 90px rgba(0, 0, 0, 0.5), inset 0 0 24px rgba(47, 215, 255, 0.08);
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 18px;
+}
+
+.modal-side {
+  display: grid;
+  gap: 18px;
+  align-content: start;
 }
 
 .modal-close {
@@ -684,7 +715,7 @@ h2 {
 }
 
 .inventory-modal .inventory-popover-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -699,21 +730,47 @@ h2 {
 }
 
 .modal-assessment {
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
+  padding: 18px;
+  border: 1px solid rgba(150, 225, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.modal-assessment h3 {
+  margin: 0 0 8px;
+  font-size: 1.35rem;
 }
 
 .modal-assessment form {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) auto;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
 .modal-assessment .preview {
   grid-column: 1 / -1;
   max-height: 220px;
+}
+
+.modal-rewards {
+  min-height: 178px;
+  padding: 18px;
+  border: 1px solid rgba(150, 225, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.inventory-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 8px 0 12px;
+  color: var(--muted);
+  font-weight: 900;
+}
+
+.inventory-heading strong {
+  color: var(--ink);
 }
 
 @keyframes pop {
@@ -785,12 +842,11 @@ h2 {
 
 @media (max-width: 1180px) {
   .quest-map {
-    inset: 140px 300px 210px 300px;
+    inset: 140px 34px 120px 280px;
   }
 
-  .assessment-dock,
-  .reward-feed {
-    width: 268px;
+  .player-action-dock {
+    width: 196px;
   }
 
   .roster-dock {
@@ -821,9 +877,8 @@ h2 {
 
   .game-hud,
   .roster-dock,
-  .assessment-dock,
+  .player-action-dock,
   .detail-panel,
-  .reward-feed,
   .quest-map {
     position: relative;
     inset: auto;
@@ -903,6 +958,10 @@ h2 {
 
   .inventory-popover-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .modal-grid {
+    grid-template-columns: 1fr;
   }
 
   .inventory-modal {

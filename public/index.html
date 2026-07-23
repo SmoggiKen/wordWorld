@@ -30,19 +30,18 @@
           <div id="playerLayer" class="player-layer"></div>
         </div>
 
-        <aside id="detailPanel" class="detail-panel">
+        <aside id="detailPanel" class="detail-panel" hidden>
           <p class="eyebrow">Quest Intel</p>
           <h2>Class Progress</h2>
           <p class="muted">Lesson rewards and player inventory.</p>
         </aside>
 
-        <section class="assessment-dock">
-          <div>
-            <p class="eyebrow">Assessment</p>
-            <h2 id="selectedPlayerName">Explorer</h2>
-            <p class="muted">Writing sample ready for review.</p>
-          </div>
-          <button class="primary-button" type="button" data-action="open-inventory">Assess Player</button>
+        <section class="player-action-dock">
+          <p class="eyebrow">Selected</p>
+          <button class="player-action-button" type="button" data-action="open-inventory">
+            <span id="selectedPlayerName">Explorer</span>
+            <small>Inventory / Assess</small>
+          </button>
         </section>
 
         <section class="roster-dock">
@@ -53,30 +52,37 @@
           <div id="playerRoster" class="player-roster"></div>
         </section>
 
-        <section class="reward-feed">
-          <p class="eyebrow">Latest Rewards</p>
-          <div id="rewardCards" class="reward-cards">
-            <p class="empty-state">No rewards yet.</p>
-          </div>
-        </section>
+        <div id="rewardCards" hidden></div>
       </section>
     </main>
 
     <div id="inventoryModal" class="modal-backdrop" hidden>
       <section class="inventory-modal" role="dialog" aria-modal="true" aria-labelledby="inventoryModalTitle">
         <button id="closeInventoryModal" class="modal-close" type="button" aria-label="Close inventory">x</button>
-        <div id="inventoryModalContent"></div>
-        <section class="modal-assessment">
-          <p class="eyebrow">Assess Work</p>
-          <form id="scanForm">
-            <label class="upload-chip">
-              <input id="imageInput" name="image" type="file" accept="image/*" capture="environment" required />
-              <span id="uploadLabel">Take photo</span>
-            </label>
-            <img id="preview" class="preview" alt="Writing preview" hidden />
-            <button class="primary-button" type="submit">Assess Work</button>
-          </form>
-        </section>
+        <div class="modal-grid">
+          <div id="inventoryModalContent"></div>
+          <div class="modal-side">
+            <section class="modal-assessment">
+              <p class="eyebrow">Assessment</p>
+              <h3>Writing Sample</h3>
+              <p class="muted">Ready for review.</p>
+              <form id="scanForm">
+                <label class="upload-chip">
+                  <input id="imageInput" name="image" type="file" accept="image/*" capture="environment" required />
+                  <span id="uploadLabel">Take photo</span>
+                </label>
+                <img id="preview" class="preview" alt="Writing preview" hidden />
+                <button class="primary-button" type="submit">Assess Work</button>
+              </form>
+            </section>
+            <section class="modal-rewards">
+              <p class="eyebrow">Latest Rewards</p>
+              <div id="modalRewardCards" class="reward-cards">
+                <p class="empty-state">No rewards yet.</p>
+              </div>
+            </section>
+          </div>
+        </div>
       </section>
     </div>
 
