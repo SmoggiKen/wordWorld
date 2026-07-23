@@ -6,12 +6,12 @@ const defaultPlayers = [
 ];
 
 const islandPositions = [
-  { x: 25, y: 64 },
-  { x: 27, y: 38 },
-  { x: 49, y: 66 },
-  { x: 58, y: 36 },
-  { x: 73, y: 58 },
-  { x: 45, y: 18 }
+  { x: 24, y: 63 },
+  { x: 31, y: 36 },
+  { x: 49, y: 70 },
+  { x: 60, y: 42 },
+  { x: 78, y: 57 },
+  { x: 46, y: 20 }
 ];
 
 const state = {
@@ -164,11 +164,12 @@ function renderMap() {
     const pos = islandPositions[index] || { x: 50, y: 50 };
     return `
       <button
-        class="lesson-island"
+        class="lesson-island island-${index + 1}"
         type="button"
         data-island-index="${index}"
         style="--x: ${pos.x}; --y: ${pos.y};"
       >
+        <span class="challenge-tag">${index === 0 ? "Start" : `Challenge ${index + 1}`}</span>
         <span class="island-glow"></span>
         <span class="island-land">
           ${toolImage({

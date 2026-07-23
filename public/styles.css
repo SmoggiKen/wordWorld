@@ -2,14 +2,16 @@
   color-scheme: dark;
   --ink: #eef8ff;
   --muted: #a8bdd0;
-  --panel: rgba(9, 22, 45, 0.82);
-  --panel-strong: rgba(8, 16, 34, 0.94);
-  --line: rgba(150, 225, 255, 0.28);
+  --panel: rgba(7, 16, 37, 0.86);
+  --panel-strong: rgba(7, 12, 30, 0.96);
+  --line: rgba(196, 111, 255, 0.42);
   --yellow: #ffd166;
   --green: #2fbf71;
   --blue: #2fd7ff;
   --red: #ef476f;
   --teal: #23f0d0;
+  --purple: #b351ff;
+  --pink: #ff59d1;
   --sand: #f8d77c;
   --water: #1ca7c9;
 }
@@ -24,8 +26,9 @@ body {
   color: var(--ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background:
-    radial-gradient(circle at 50% 30%, rgba(47, 215, 255, 0.22), transparent 34rem),
-    linear-gradient(135deg, #08152e 0%, #07111f 45%, #0d2446 100%);
+    radial-gradient(circle at 18% 22%, rgba(35, 240, 208, 0.18), transparent 16rem),
+    radial-gradient(circle at 84% 74%, rgba(255, 89, 209, 0.16), transparent 18rem),
+    linear-gradient(135deg, #050816 0%, #091225 48%, #110824 100%);
 }
 
 button,
@@ -45,16 +48,21 @@ button {
 .map-frame {
   position: relative;
   min-height: calc(100vh - 36px);
-  border: 2px solid rgba(169, 235, 255, 0.36);
-  border-radius: 8px;
+  border: 2px solid rgba(211, 100, 255, 0.56);
+  border-radius: 18px;
   overflow: hidden;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    radial-gradient(circle at center, rgba(32, 168, 204, 0.24), transparent 36rem),
-    #071427;
-  background-size: 36px 36px, 36px 36px, auto, auto;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36), inset 0 0 80px rgba(47, 215, 255, 0.08);
+    radial-gradient(circle at 28% 20%, rgba(47, 215, 255, 0.26), transparent 18rem),
+    radial-gradient(circle at 78% 22%, rgba(255, 89, 209, 0.2), transparent 16rem),
+    radial-gradient(circle at 44% 58%, rgba(255, 255, 255, 0.06) 0 1px, transparent 2px),
+    linear-gradient(90deg, rgba(47, 215, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(47, 215, 255, 0.07) 1px, transparent 1px),
+    #050b1a;
+  background-size: auto, auto, 46px 46px, 44px 44px, 44px 44px, auto;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.46),
+    0 0 22px rgba(179, 81, 255, 0.34),
+    inset 0 0 92px rgba(47, 215, 255, 0.1);
 }
 
 .map-frame::before {
@@ -62,8 +70,22 @@ button {
   position: absolute;
   inset: 18px;
   pointer-events: none;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 8px;
+  border: 1px solid rgba(255, 89, 209, 0.54);
+  border-radius: 14px;
+  box-shadow: inset 0 0 28px rgba(47, 215, 255, 0.2), 0 0 18px rgba(255, 89, 209, 0.2);
+}
+
+.map-frame::after {
+  content: "";
+  position: absolute;
+  inset: 26px;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(47, 215, 255, 0.84) 0 56px, transparent 56px calc(100% - 56px), rgba(255, 89, 209, 0.74) calc(100% - 56px) 100%) top left / 100% 3px no-repeat,
+    linear-gradient(90deg, rgba(255, 89, 209, 0.74) 0 56px, transparent 56px calc(100% - 56px), rgba(47, 215, 255, 0.74) calc(100% - 56px) 100%) bottom left / 100% 3px no-repeat,
+    linear-gradient(0deg, rgba(47, 215, 255, 0.74) 0 56px, transparent 56px calc(100% - 56px), rgba(255, 89, 209, 0.74) calc(100% - 56px) 100%) left top / 3px 100% no-repeat,
+    linear-gradient(0deg, rgba(255, 89, 209, 0.74) 0 56px, transparent 56px calc(100% - 56px), rgba(47, 215, 255, 0.74) calc(100% - 56px) 100%) right top / 3px 100% no-repeat;
+  opacity: 0.68;
 }
 
 .game-hud {
@@ -86,7 +108,7 @@ button {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28), inset 0 0 18px rgba(47, 215, 255, 0.05);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.38), 0 0 16px rgba(179, 81, 255, 0.16), inset 0 0 18px rgba(47, 215, 255, 0.07);
   backdrop-filter: blur(12px);
 }
 
@@ -97,9 +119,11 @@ button {
   place-items: center;
   border-radius: 50%;
   color: #061528;
-  background: radial-gradient(circle, var(--yellow), #b87933);
-  border: 5px solid rgba(255, 255, 255, 0.42);
+  background:
+    radial-gradient(circle at 50% 50%, #ffe8a8 0 28%, #d99a3a 29% 62%, #3c274b 63%);
+  border: 5px solid rgba(255, 209, 102, 0.74);
   font-weight: 1000;
+  box-shadow: 0 0 0 5px rgba(47, 215, 255, 0.16), 0 0 24px rgba(255, 209, 102, 0.28);
 }
 
 .title-stack {
@@ -124,11 +148,16 @@ p {
 
 h1 {
   margin-bottom: 0;
-  color: #f8fdff;
+  color: #fff2ff;
   font-size: clamp(3rem, 8vw, 6.5rem);
   line-height: 0.86;
   text-transform: uppercase;
-  text-shadow: 0 0 8px #2fd7ff, 0 0 24px rgba(47, 215, 255, 0.7), 0 5px 0 #0b4a7a;
+  -webkit-text-stroke: 2px #7b2cc8;
+  text-shadow:
+    0 0 8px #ff59d1,
+    0 0 18px rgba(179, 81, 255, 0.85),
+    0 8px 0 #40106d,
+    0 12px 0 rgba(0, 0, 0, 0.36);
 }
 
 h2 {
@@ -152,6 +181,10 @@ h2 {
   text-transform: uppercase;
 }
 
+.score-card {
+  border-color: rgba(255, 209, 102, 0.5);
+}
+
 .score-card strong {
   font-size: 2rem;
   line-height: 1;
@@ -159,58 +192,140 @@ h2 {
 
 .quest-map {
   position: absolute;
-  inset: 116px 60px 58px 330px;
+  inset: 116px 44px 56px 316px;
   min-height: 480px;
-  border-radius: 48% 52% 46% 54%;
+  border-radius: 18px;
+  overflow: visible;
   background:
-    radial-gradient(circle at 48% 44%, rgba(255, 255, 255, 0.28), transparent 4rem),
-    radial-gradient(circle at 50% 50%, #79d68a 0 37%, #42b96d 37% 52%, #f2d37f 52% 60%, #168fb5 60% 70%, transparent 70%),
-    radial-gradient(circle at 50% 50%, rgba(47, 215, 255, 0.35), transparent 74%);
-  box-shadow: 0 0 0 18px rgba(47, 215, 255, 0.18), 0 0 80px rgba(47, 215, 255, 0.32);
+    radial-gradient(circle at 50% 48%, rgba(179, 81, 255, 0.18), transparent 28rem),
+    radial-gradient(circle at 50% 52%, rgba(47, 215, 255, 0.12), transparent 34rem);
 }
 
-.quest-map::before,
-.quest-map::after {
+.planet-grid,
+.map-continent,
+.map-scenery {
+  position: absolute;
+  pointer-events: none;
+}
+
+.planet-grid {
+  z-index: 0;
+  left: 6%;
+  top: 2%;
+  width: 86%;
+  height: 90%;
+  border-radius: 50%;
+  background:
+    linear-gradient(90deg, transparent 49%, rgba(218, 177, 255, 0.42) 49.6% 50.4%, transparent 51%),
+    linear-gradient(0deg, transparent 49%, rgba(218, 177, 255, 0.42) 49.6% 50.4%, transparent 51%),
+    repeating-linear-gradient(72deg, transparent 0 68px, rgba(218, 177, 255, 0.28) 69px 71px, transparent 72px 138px),
+    radial-gradient(circle at center, rgba(190, 91, 255, 0.5), rgba(67, 50, 150, 0.42) 50%, rgba(18, 29, 88, 0.22) 68%, transparent 69%);
+  box-shadow: 0 0 48px rgba(179, 81, 255, 0.36), inset 0 0 48px rgba(255, 255, 255, 0.12);
+}
+
+.map-continent {
+  z-index: 2;
+  left: 13%;
+  top: 4%;
+  width: 75%;
+  height: 86%;
+  clip-path: polygon(34% 2%, 50% 0, 62% 7%, 72% 4%, 84% 18%, 80% 31%, 94% 39%, 87% 55%, 91% 71%, 75% 82%, 62% 78%, 54% 95%, 39% 86%, 27% 97%, 19% 80%, 8% 75%, 15% 58%, 4% 45%, 13% 32%, 10% 17%, 23% 10%);
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255, 236, 150, 0.8) 0 2%, transparent 2.2%),
+    radial-gradient(circle at 68% 40%, rgba(35, 240, 208, 0.64) 0 14%, transparent 14.4%),
+    radial-gradient(circle at 42% 54%, rgba(255, 89, 209, 0.3) 0 11%, transparent 11.5%),
+    linear-gradient(128deg, #e8c1df 0 28%, #a94acc 28% 45%, #29a68f 45% 64%, #174e73 64% 100%);
+  border: 5px solid rgba(255, 239, 173, 0.72);
+  box-shadow: 0 18px 0 rgba(17, 34, 82, 0.7), 0 0 42px rgba(35, 240, 208, 0.3);
+}
+
+.map-continent::before,
+.map-continent::after {
   content: "";
   position: absolute;
-  border-radius: 50%;
-  background: rgba(25, 89, 60, 0.34);
+  inset: 8%;
+  background:
+    radial-gradient(ellipse at 24% 22%, #18442d 0 2.2%, transparent 2.5%),
+    radial-gradient(ellipse at 31% 30%, #155334 0 2%, transparent 2.3%),
+    radial-gradient(ellipse at 58% 18%, #164a35 0 2.6%, transparent 2.9%),
+    radial-gradient(ellipse at 69% 49%, #143f32 0 2.8%, transparent 3.1%),
+    radial-gradient(ellipse at 48% 68%, #155334 0 2.5%, transparent 2.8%),
+    radial-gradient(ellipse at 77% 72%, #174f34 0 2.4%, transparent 2.7%),
+    radial-gradient(ellipse at 20% 72%, #154335 0 2.2%, transparent 2.5%);
 }
 
-.quest-map::before {
-  left: 16%;
-  top: 20%;
-  width: 18%;
-  height: 28%;
+.map-continent::after {
+  inset: 0;
+  background:
+    linear-gradient(126deg, transparent 0 46%, rgba(161, 245, 255, 0.6) 47% 49%, transparent 50%),
+    linear-gradient(21deg, transparent 0 56%, rgba(161, 245, 255, 0.48) 57% 58.4%, transparent 59%),
+    radial-gradient(circle at 70% 68%, rgba(255, 209, 102, 0.72) 0 2.6%, transparent 2.9%);
 }
 
-.quest-map::after {
-  right: 19%;
-  bottom: 17%;
-  width: 20%;
-  height: 24%;
+.map-scenery {
+  z-index: 3;
+  width: 60px;
+  height: 70px;
+  background:
+    linear-gradient(135deg, transparent 0 34%, #aeb8c9 35% 58%, #53627c 59% 100%);
+  clip-path: polygon(50% 0, 78% 36%, 63% 36%, 88% 80%, 12% 80%, 37% 36%, 22% 36%);
+  filter: drop-shadow(0 8px 0 rgba(0, 0, 0, 0.28));
+}
+
+.scenery-a {
+  left: 30%;
+  top: 13%;
+}
+
+.scenery-b {
+  right: 20%;
+  top: 23%;
+  transform: scale(0.85);
+}
+
+.scenery-c {
+  left: 42%;
+  bottom: 16%;
+  transform: scale(0.78);
+}
+
+.scenery-d {
+  right: 32%;
+  bottom: 29%;
+  transform: scale(0.65);
 }
 
 .route {
   position: absolute;
-  z-index: 1;
+  z-index: 4;
   pointer-events: none;
-  border: 5px dashed rgba(255, 232, 148, 0.75);
+  border: 6px solid rgba(255, 228, 122, 0.86);
   border-radius: 50%;
+  box-shadow: 0 0 16px rgba(255, 89, 209, 0.48);
 }
 
 .route-a {
-  inset: 22% 14% 20% 12%;
+  inset: 24% 18% 20% 15%;
   border-left-color: transparent;
   border-bottom-color: transparent;
-  transform: rotate(-20deg);
+  border-style: dashed;
+  transform: rotate(-18deg);
 }
 
 .route-b {
-  inset: 31% 22% 26% 22%;
+  inset: 34% 26% 25% 24%;
   border-top-color: transparent;
   border-right-color: transparent;
-  transform: rotate(16deg);
+  border-style: dashed;
+  transform: rotate(15deg);
+}
+
+.route-c {
+  inset: 16% 30% 44% 28%;
+  border-left-color: transparent;
+  border-top-color: transparent;
+  border-style: dashed;
+  transform: rotate(11deg);
 }
 
 .island-map,
@@ -221,16 +336,35 @@ h2 {
 
 .lesson-island {
   position: absolute;
-  z-index: 3;
+  z-index: 7;
   left: calc(var(--x) * 1%);
   top: calc(var(--y) * 1%);
-  width: 138px;
-  min-height: 130px;
+  width: 132px;
+  min-height: 118px;
   transform: translate(-50%, -50%);
   border: 0;
   background: transparent;
   color: var(--ink);
   cursor: pointer;
+}
+
+.challenge-tag {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: -6px;
+  min-width: 92px;
+  padding: 5px 7px;
+  transform: translateX(-50%);
+  border: 2px solid rgba(255, 209, 102, 0.82);
+  border-radius: 6px;
+  background: linear-gradient(180deg, #1e1136, #090b1f);
+  color: #fff6a5;
+  font-size: 0.6rem;
+  font-weight: 1000;
+  line-height: 1;
+  text-transform: uppercase;
+  box-shadow: 0 0 12px rgba(255, 89, 209, 0.44), 0 5px 0 rgba(0, 0, 0, 0.32);
 }
 
 .lesson-island:focus-visible,
@@ -247,25 +381,26 @@ h2 {
 
 .island-glow {
   position: absolute;
-  inset: 12px 6px 28px;
+  inset: 12px 4px 26px;
   border-radius: 50%;
-  background: rgba(47, 215, 255, 0.22);
-  filter: blur(10px);
+  background: rgba(255, 89, 209, 0.3);
+  filter: blur(12px);
 }
 
 .island-land {
   position: relative;
   z-index: 1;
-  width: 104px;
-  height: 76px;
+  width: 98px;
+  height: 72px;
   margin: 0 auto;
   display: grid;
   place-items: center;
-  border-radius: 50% 50% 42% 42%;
+  border-radius: 48% 52% 42% 58%;
   background:
-    linear-gradient(180deg, #7ddd88 0 48%, var(--sand) 48% 76%, #b87933 76%);
-  border: 3px solid rgba(5, 17, 36, 0.35);
-  box-shadow: 0 12px 0 rgba(16, 71, 97, 0.22);
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.42), transparent 16%),
+    linear-gradient(150deg, #98ef9d 0 38%, #25a16f 39% 64%, #f8d77c 65% 78%, #8b5e2d 79%);
+  border: 3px solid rgba(255, 239, 173, 0.72);
+  box-shadow: 0 12px 0 rgba(28, 24, 82, 0.58), 0 0 18px rgba(47, 215, 255, 0.26);
 }
 
 .tool-image {
@@ -277,25 +412,26 @@ h2 {
 }
 
 .island-land .tool-image {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
 }
 
 .island-label {
   position: relative;
   z-index: 2;
   display: block;
-  width: 100%;
-  margin-top: 8px;
-  padding: 7px 8px;
-  border: 2px solid #7a4d22;
+  width: calc(100% - 8px);
+  margin: 9px auto 0;
+  padding: 6px 7px;
+  border: 2px solid #74451f;
   border-radius: 4px;
-  background: linear-gradient(180deg, #ffd166, #d99a3a);
+  background: linear-gradient(180deg, #ffe899, #d99a3a);
   color: #17202a;
   font-weight: 1000;
-  line-height: 1.05;
+  font-size: 0.86rem;
+  line-height: 1;
   text-align: center;
-  box-shadow: 0 6px 0 rgba(6, 21, 40, 0.5);
+  box-shadow: 0 6px 0 rgba(6, 21, 40, 0.62), 0 0 10px rgba(255, 209, 102, 0.28);
 }
 
 .player-layer {
@@ -437,9 +573,9 @@ h2 {
 .player-action-dock {
   position: absolute;
   z-index: 12;
-  right: 26px;
-  top: 150px;
-  width: 210px;
+  right: 32px;
+  top: 142px;
+  width: 190px;
   padding: 12px;
 }
 
@@ -450,9 +586,9 @@ h2 {
   gap: 4px;
   align-content: center;
   padding: 12px;
-  border: 1px solid rgba(47, 215, 255, 0.55);
+  border: 1px solid rgba(35, 240, 208, 0.55);
   border-radius: 8px;
-  background: rgba(47, 215, 255, 0.1);
+  background: linear-gradient(135deg, rgba(35, 240, 208, 0.16), rgba(179, 81, 255, 0.12));
   color: var(--ink);
   cursor: pointer;
   text-align: left;
@@ -536,9 +672,9 @@ h2 {
 .roster-dock {
   position: absolute;
   z-index: 12;
-  left: 26px;
-  top: 150px;
-  width: 284px;
+  left: 32px;
+  top: 142px;
+  width: 250px;
   padding: 16px;
 }
 
@@ -563,16 +699,16 @@ h2 {
   align-items: center;
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(47, 215, 255, 0.18);
+  background: rgba(8, 20, 48, 0.64);
   color: var(--ink);
   cursor: pointer;
   text-align: left;
 }
 
 .player-card.active {
-  border-color: var(--yellow);
-  box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.22);
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(255, 89, 209, 0.2), 0 0 18px rgba(47, 215, 255, 0.12);
 }
 
 .player-card strong,
@@ -842,15 +978,15 @@ h2 {
 
 @media (max-width: 1180px) {
   .quest-map {
-    inset: 140px 34px 120px 280px;
+    inset: 132px 28px 96px 276px;
   }
 
   .player-action-dock {
-    width: 196px;
+    width: 176px;
   }
 
   .roster-dock {
-    width: 258px;
+    width: 238px;
   }
 
   .detail-panel {
@@ -909,15 +1045,17 @@ h2 {
     min-height: 680px;
     border-radius: 8px;
     background:
-      linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-      linear-gradient(0deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-      linear-gradient(135deg, #74d7ee 0%, #35aeca 42%, #207aa3 100%);
+      radial-gradient(circle at 50% 36%, rgba(179, 81, 255, 0.28), transparent 20rem),
+      linear-gradient(90deg, rgba(47, 215, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(0deg, rgba(47, 215, 255, 0.08) 1px, transparent 1px),
+      #071127;
     background-size: 24px 24px, 24px 24px, auto;
     box-shadow: 0 0 0 1px rgba(47, 215, 255, 0.28);
   }
 
-  .quest-map::before,
-  .quest-map::after,
+  .planet-grid,
+  .map-continent,
+  .map-scenery,
   .route {
     display: none;
   }
@@ -990,9 +1128,9 @@ h2 {
     padding: 12px;
     border-radius: 8px;
     background:
-      linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-      linear-gradient(0deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
-      linear-gradient(135deg, #74d7ee 0%, #35aeca 42%, #207aa3 100%);
+      linear-gradient(90deg, rgba(47, 215, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(0deg, rgba(47, 215, 255, 0.08) 1px, transparent 1px),
+      #071127;
     background-size: 24px 24px, 24px 24px, auto;
   }
 
