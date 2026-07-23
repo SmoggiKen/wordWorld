@@ -7,105 +7,65 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <main class="app-shell">
-      <section class="topbar">
-        <div>
-          <p class="eyebrow">Write - Scan - Celebrate</p>
-          <h1>Word World</h1>
-        </div>
-        <div class="level-pill">
-          <span id="level">Level 1</span>
-          <strong id="xp">0 XP</strong>
-        </div>
-      </section>
-
-      <section class="writer-panel">
-        <div class="avatar" aria-hidden="true">
-          <div class="avatar-face"></div>
-          <div class="avatar-body"></div>
-        </div>
-        <div class="progress-wrap">
-          <div class="progress-label">
-            <span id="writerName">Explorer</span>
-            <span id="nextLevel">100 XP to Level 2</span>
+    <main class="game-shell">
+      <section class="map-frame" aria-label="Level 2 writing map">
+        <header class="game-hud">
+          <div class="compass">
+            <span>W</span>
           </div>
-          <div class="progress-track">
-            <div id="progressBar" class="progress-bar"></div>
+          <div class="title-stack">
+            <p class="eyebrow">Word World</p>
+            <h1 id="currentYearTitle">Y1</h1>
           </div>
+          <div class="score-card">
+            <span>Group XP</span>
+            <strong id="groupXp">0</strong>
+          </div>
+        </header>
+
+        <div id="questMap" class="quest-map">
+          <div class="route route-a"></div>
+          <div class="route route-b"></div>
+          <div id="islandMap" class="island-map"></div>
+          <div id="playerLayer" class="player-layer"></div>
         </div>
-      </section>
 
-      <nav class="tabs" aria-label="Main sections">
-        <button class="tab active" data-view="scan">Scan</button>
-        <button class="tab" data-view="rewards">Map</button>
-        <button class="tab" data-view="inventory">Inventory</button>
-      </nav>
+        <aside id="detailPanel" class="detail-panel">
+          <p class="eyebrow">Quest Intel</p>
+          <h2>Class Progress</h2>
+          <p class="muted">Lesson rewards and player inventory.</p>
+        </aside>
 
-      <section id="scanView" class="view active">
-        <div class="scan-grid">
-          <div class="scan-panel">
-            <div class="scan-heading">
-              <div>
-                <h2>Scan writing</h2>
-                <p class="selected-writer">For <strong id="scanWriterName">Explorer</strong></p>
-              </div>
-              <button id="changeWriterButton" class="secondary-button" type="button">Change</button>
-            </div>
-            <p class="muted">Take a photo of a handwritten sentence. The app looks for positive features and unlocks progress.</p>
-            <form id="scanForm">
-              <label class="upload-box">
-                <input id="imageInput" name="image" type="file" accept="image/*" capture="environment" required />
-                <span>Choose or take photo</span>
-              </label>
-              <img id="preview" class="preview" alt="Writing preview" hidden />
-              <button class="primary-button" type="submit">Start Adventure</button>
-            </form>
-          </div>
-
-          <div class="scan-panel checks-panel">
-            <h2>Today's writing tools</h2>
-            <div id="criteriaList" class="criteria-list"></div>
-          </div>
-        </div>
-      </section>
-
-      <section id="rewardsView" class="view">
-        <div class="map-layout">
-          <div class="map-stage">
-            <div class="map-header">
-              <div>
-                <p class="eyebrow">Lesson Map</p>
-                <h2>Writing Islands</h2>
-              </div>
-              <div class="group-score">
-                <span>Group XP</span>
-                <strong id="groupXp">0</strong>
-              </div>
-            </div>
-            <div id="islandMap" class="island-map"></div>
-          </div>
-
-          <aside class="roster-panel">
-            <h2>Players</h2>
-            <div id="playerRoster" class="player-roster"></div>
-            <div class="celebration-panel">
-              <h2>Latest Rewards</h2>
-              <div id="rewardCards" class="reward-cards">
-                <p class="empty-state">Scan work to light up the map.</p>
-              </div>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <section id="inventoryView" class="view">
-        <div class="inventory-header">
+        <section class="assessment-dock">
           <div>
-            <h2>Inventory</h2>
-            <p class="muted">Unlocked tools show what <span id="inventoryWriterName">your writer</span> has learned.</p>
+            <p class="eyebrow">Assessment</p>
+            <h2 id="selectedPlayerName">Explorer</h2>
+            <p class="muted">Writing sample ready for review.</p>
           </div>
-        </div>
-        <div id="inventoryGrid" class="inventory-grid"></div>
+          <form id="scanForm">
+            <label class="upload-chip">
+              <input id="imageInput" name="image" type="file" accept="image/*" capture="environment" required />
+              <span id="uploadLabel">Choose photo</span>
+            </label>
+            <img id="preview" class="preview" alt="Writing preview" hidden />
+            <button class="primary-button" type="submit">Assess Work</button>
+          </form>
+        </section>
+
+        <section class="roster-dock">
+          <div class="dock-heading">
+            <p class="eyebrow">Players</p>
+            <span id="level">Y1</span>
+          </div>
+          <div id="playerRoster" class="player-roster"></div>
+        </section>
+
+        <section class="reward-feed">
+          <p class="eyebrow">Latest Rewards</p>
+          <div id="rewardCards" class="reward-cards">
+            <p class="empty-state">No rewards yet.</p>
+          </div>
+        </section>
       </section>
     </main>
 
