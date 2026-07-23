@@ -113,6 +113,9 @@ app.post("/api/scans", upload.single("image"), async (req, res, next) => {
     const profileId = req.body.profileId;
     if (!profileId) return res.status(400).json({ error: "profileId is required" });
     if (!req.file) return res.status(400).json({ error: "image is required" });
+    if (!["image/jpeg", "image/png", "image/webp"].includes(req.file.mimetype)) {
+      return res.status(400).json({ error: "Use a JPG, PNG, or WebP image for assessment." });
+    }
 
     const criteria = await getActiveCriteria();
     const aiResults = await analyzeWritingImage({

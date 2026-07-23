@@ -24,6 +24,7 @@ const state = {
   groupStates: new Map(),
   tokenPositions: readJson("wordWorldTokenPositions", {}),
   tokenStack: readJson("wordWorldTokenStack", []),
+  scanFile: null,
   inventoryOpen: false,
   dragging: null
 };
@@ -338,18 +339,28 @@ function renderInventoryModal() {
   els.inventoryModalContent.innerHTML = playerDetailHtml(player, profileState);
 }
 
-els.imageInput.addEventListener("change", () => {
+els.imageInput.addEventListener("change", async () => {
   const file = els.imageInput.files?.[0];
   if (!file) return;
-  els.preview.src = URL.createObjectURL(file);
-  els.preview.hidden = false;
-  els.uploadLabel.textContent = file.name.length > 22 ? `${file.name.slice(0, 19)}...` : file.name;
+
+  try {
+    state.scanFile = await normalizeImageFile(file);
+    els.preview.src = URL.createObjectURL(state.scanFile);
+    els.preview.hidden = false;
+    els.uploadLabel.textContent = file.name.length > 22 ? `${file.name.slice(0, 19)}...` : file.name;
+  } catch (error) {
+    state.scanFile = null;
+    els.imageInput.value = "";
+    els.preview.hidden = true;
+    els.uploadLabel.textContent = "Take photo";
+    showToast(error.message);
+  }
 });
 
 els.scanForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const button = els.scanForm.querySelector("button");
-  const file = els.imageInput.files?.[0];
+  const file = state.scanFile || els.imageInput.files?.[0];
   if (!file) return showToast("Choose a photo first.");
 
   const formData = new FormData();
@@ -555,6 +566,31 @@ function progressPercentFor(profileState) {
     return criterion.unlock_item_key && unlockedKeys.has(criterion.unlock_item_key);
   }).length;
   return Math.round((unlockedCriteriaCount / state.criteria.length) * 100);
+}
+
+async function normalizeImageFile(file) {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Choose an image file.");
+  }
+
+  const supportedWithoutConversion = ["image/jpeg", "image/png", "image/webp"];
+  try {
+    const bitmap = await createImageBitmap(file);
+    const maxSide = 1600;
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const context = canvas.getContext("2d");
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close?.();
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.9));
+    if (!blob) throw new Error("Could not prepare image.");
+    return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+  } catch (error) {
+    if (supportedWithoutConversion.includes(file.type)) return file;
+    throw new Error("This image format is not supported. Try a JPG or PNG photo.");
+  }
 }
 
 function promoteToken(profileId) {

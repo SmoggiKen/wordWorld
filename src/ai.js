@@ -35,39 +35,47 @@ export async function analyzeWritingImage({ imageBuffer, mimeType, criteria }) {
     return mockAnalyzeWriting(criteria);
   }
 
-  const dataUrl = `data:${mimeType};base64,${imageBuffer.toString("base64")}`;
-  const response = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: process.env.OPENAI_MODEL || "gpt-5",
-      input: [
-        {
-          role: "user",
-          content: [
-            { type: "input_text", text: buildScanPrompt(criteria) },
-            { type: "input_image", image_url: dataUrl, detail: "high" }
-          ]
-        }
-      ]
-    })
-  });
+  try {
+    const dataUrl = `data:${mimeType};base64,${imageBuffer.toString("base64")}`;
+    const response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: process.env.OPENAI_MODEL || "gpt-5",
+        input: [
+          {
+            role: "user",
+            content: [
+              { type: "input_text", text: buildScanPrompt(criteria) },
+              { type: "input_image", image_url: dataUrl, detail: "high" }
+            ]
+          }
+        ]
+      })
+    });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`OpenAI request failed: ${response.status} ${body}`);
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`OpenAI request failed: ${response.status} ${extractOpenAIError(body)}`);
+    }
+
+    const payload = await response.json();
+    const outputText = payload.output_text || extractOutputText(payload);
+    const parsed = parseJsonObject(outputText);
+
+    return Object.fromEntries(criteria.map((criterion) => {
+      return [criterion.key, Boolean(parsed[criterion.key])];
+    }));
+  } catch (error) {
+    if (process.env.AI_FALLBACK_ON_ERROR === "true") {
+      console.warn(`AI assessment failed, using mock result: ${error.message}`);
+      return mockAnalyzeWriting(criteria);
+    }
+    throw new Error(`Assessment AI failed: ${error.message}`);
   }
-
-  const payload = await response.json();
-  const outputText = payload.output_text || extractOutputText(payload);
-  const parsed = JSON.parse(outputText);
-
-  return Object.fromEntries(criteria.map((criterion) => {
-    return [criterion.key, Boolean(parsed[criterion.key])];
-  }));
 }
 
 function extractOutputText(payload) {
@@ -78,4 +86,29 @@ function extractOutputText(payload) {
     }
   }
   return chunks.join("\n");
+}
+
+function parseJsonObject(text) {
+  const trimmed = String(text || "").trim();
+  if (!trimmed) throw new Error("AI returned an empty result");
+
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    const start = trimmed.indexOf("{");
+    const end = trimmed.lastIndexOf("}");
+    if (start === -1 || end === -1 || end <= start) {
+      throw new Error("AI returned a non-JSON result");
+    }
+    return JSON.parse(trimmed.slice(start, end + 1));
+  }
+}
+
+function extractOpenAIError(body) {
+  try {
+    const parsed = JSON.parse(body);
+    return parsed.error?.message || body;
+  } catch {
+    return body;
+  }
 }
