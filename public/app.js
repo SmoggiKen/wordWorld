@@ -23,6 +23,7 @@ const state = {
   roster: [],
   groupStates: new Map(),
   tokenPositions: readJson("wordWorldTokenPositions", {}),
+  inventoryOpen: false,
   dragging: null
 };
 
@@ -35,12 +36,16 @@ const els = {
   playerLayer: document.querySelector("#playerLayer"),
   playerRoster: document.querySelector("#playerRoster"),
   detailPanel: document.querySelector("#detailPanel"),
+  assessmentDock: document.querySelector(".assessment-dock"),
   rewardCards: document.querySelector("#rewardCards"),
   scanForm: document.querySelector("#scanForm"),
   imageInput: document.querySelector("#imageInput"),
   uploadLabel: document.querySelector("#uploadLabel"),
   preview: document.querySelector("#preview"),
   questMap: document.querySelector("#questMap"),
+  inventoryModal: document.querySelector("#inventoryModal"),
+  inventoryModalContent: document.querySelector("#inventoryModalContent"),
+  closeInventoryModal: document.querySelector("#closeInventoryModal"),
   toast: document.querySelector("#toast")
 };
 
@@ -137,6 +142,7 @@ function render() {
   renderRoster();
   renderRewards();
   renderDetailForCurrentPlayer();
+  renderInventoryModal();
 }
 
 function renderHud() {
@@ -237,7 +243,27 @@ function renderDetailForCurrentPlayer() {
   const player = state.roster.find((item) => item.id === state.profileId);
   if (!player) return;
   const profileState = state.groupStates.get(player.id);
-  els.detailPanel.innerHTML = playerDetailHtml(player, profileState);
+  const profile = profileState?.profile;
+  const unlockedCount = profileState?.inventory.filter((item) => item.unlocked).length || 0;
+  const totalCount = profileState?.inventory.length || 0;
+  const island = progressIslandIndex(profileState) + 1;
+  els.detailPanel.innerHTML = `
+    <p class="eyebrow">Selected Player</p>
+    <div class="detail-title">
+      ${playerToken(player, profile?.display_name)}
+      <div>
+        <h2>${escapeHtml(profile?.display_name || player.name)}</h2>
+        <p class="muted">${yearLabelForLevel(profile?.level || 1)} - Island ${island} - ${profile?.xp || 0} XP</p>
+      </div>
+    </div>
+    <div class="detail-list">
+      <strong>Inventory</strong>
+      <span>${unlockedCount}/${totalCount} tools unlocked</span>
+    </div>
+    <button class="secondary-button inventory-open-button" type="button" data-action="open-inventory">
+      Open Inventory
+    </button>
+  `;
 }
 
 function renderIslandDetail(index) {
@@ -273,7 +299,7 @@ function playerDetailHtml(player, profileState) {
     <div class="detail-title">
       ${playerToken(player, profile?.display_name)}
       <div>
-        <h2>${escapeHtml(profile?.display_name || player.name)}</h2>
+        <h2 id="inventoryModalTitle">${escapeHtml(profile?.display_name || player.name)}</h2>
         <p class="muted">${yearLabelForLevel(profile?.level || 1)} - ${profile?.xp || 0} XP</p>
       </div>
     </div>
@@ -291,6 +317,28 @@ function playerDetailHtml(player, profileState) {
       `).join("")}
     </div>
   `;
+}
+
+function openInventoryModal() {
+  state.inventoryOpen = true;
+  renderInventoryModal();
+  els.inventoryModal.hidden = false;
+  document.body.classList.add("modal-open");
+  els.closeInventoryModal.focus();
+}
+
+function closeInventoryModal() {
+  state.inventoryOpen = false;
+  els.inventoryModal.hidden = true;
+  document.body.classList.remove("modal-open");
+}
+
+function renderInventoryModal() {
+  if (!state.inventoryOpen) return;
+  const player = state.roster.find((item) => item.id === state.profileId);
+  if (!player) return closeInventoryModal();
+  const profileState = state.groupStates.get(player.id);
+  els.inventoryModalContent.innerHTML = playerDetailHtml(player, profileState);
 }
 
 els.imageInput.addEventListener("change", () => {
@@ -352,6 +400,18 @@ els.islandMap.addEventListener("click", (event) => {
   renderIslandDetail(Number(island.dataset.islandIndex));
 });
 
+els.detailPanel.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-action='open-inventory']");
+  if (!button) return;
+  openInventoryModal();
+});
+
+els.assessmentDock.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-action='open-inventory']");
+  if (!button) return;
+  openInventoryModal();
+});
+
 els.playerRoster.addEventListener("click", (event) => {
   const card = event.target.closest("[data-profile-id]");
   if (!card) return;
@@ -373,6 +433,7 @@ els.playerLayer.addEventListener("pointerdown", (event) => {
   const profileId = token.dataset.profileId;
   setCurrentProfile(profileId);
   renderDetailForCurrentPlayer();
+  renderInventoryModal();
   token.setPointerCapture(event.pointerId);
   state.dragging = { profileId, pointerId: event.pointerId, rect: els.questMap.getBoundingClientRect(), mode: "pointer" };
   token.classList.add("dragging");
@@ -402,6 +463,7 @@ els.playerLayer.addEventListener("mousedown", (event) => {
   const profileId = token.dataset.profileId;
   setCurrentProfile(profileId);
   renderDetailForCurrentPlayer();
+  renderInventoryModal();
   state.dragging = { profileId, rect: els.questMap.getBoundingClientRect(), mode: "mouse" };
   token.classList.add("dragging");
   event.preventDefault();
@@ -415,6 +477,16 @@ document.addEventListener("mousemove", (event) => {
 document.addEventListener("mouseup", () => {
   if (!state.dragging || state.dragging.mode !== "mouse") return;
   completeDrag();
+});
+
+els.closeInventoryModal.addEventListener("click", closeInventoryModal);
+
+els.inventoryModal.addEventListener("click", (event) => {
+  if (event.target === els.inventoryModal) closeInventoryModal();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && state.inventoryOpen) closeInventoryModal();
 });
 
 function finishDrag(event) {

@@ -42,14 +42,7 @@
             <h2 id="selectedPlayerName">Explorer</h2>
             <p class="muted">Writing sample ready for review.</p>
           </div>
-          <form id="scanForm">
-            <label class="upload-chip">
-              <input id="imageInput" name="image" type="file" accept="image/*" capture="environment" required />
-              <span id="uploadLabel">Choose photo</span>
-            </label>
-            <img id="preview" class="preview" alt="Writing preview" hidden />
-            <button class="primary-button" type="submit">Assess Work</button>
-          </form>
+          <button class="primary-button" type="button" data-action="open-inventory">Assess Player</button>
         </section>
 
         <section class="roster-dock">
@@ -68,6 +61,24 @@
         </section>
       </section>
     </main>
+
+    <div id="inventoryModal" class="modal-backdrop" hidden>
+      <section class="inventory-modal" role="dialog" aria-modal="true" aria-labelledby="inventoryModalTitle">
+        <button id="closeInventoryModal" class="modal-close" type="button" aria-label="Close inventory">x</button>
+        <div id="inventoryModalContent"></div>
+        <section class="modal-assessment">
+          <p class="eyebrow">Assess Work</p>
+          <form id="scanForm">
+            <label class="upload-chip">
+              <input id="imageInput" name="image" type="file" accept="image/*" capture="environment" required />
+              <span id="uploadLabel">Take photo</span>
+            </label>
+            <img id="preview" class="preview" alt="Writing preview" hidden />
+            <button class="primary-button" type="submit">Assess Work</button>
+          </form>
+        </section>
+      </section>
+    </div>
 
     <div id="toast" class="toast" hidden></div>
     <script src="/app.js" type="module"></script>
