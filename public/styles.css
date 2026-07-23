@@ -347,6 +347,22 @@ h2 {
   cursor: pointer;
 }
 
+.lesson-island.snap-target .island-glow {
+  background: rgba(35, 240, 208, 0.5);
+  filter: blur(9px);
+  opacity: 1;
+}
+
+.lesson-island.snap-target .island-land {
+  border-color: rgba(255, 209, 102, 0.95);
+  box-shadow: 0 12px 0 rgba(28, 24, 82, 0.58), 0 0 26px rgba(35, 240, 208, 0.5);
+}
+
+.lesson-island.snap-target .challenge-tag {
+  border-color: rgba(35, 240, 208, 0.9);
+  color: white;
+}
+
 .challenge-tag {
   position: absolute;
   z-index: 4;
@@ -451,7 +467,7 @@ h2 {
   cursor: grab;
   touch-action: none;
   pointer-events: auto;
-  transition: left 280ms cubic-bezier(0.2, 0.8, 0.2, 1), top 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: left 360ms cubic-bezier(0.18, 0.92, 0.2, 1), top 360ms cubic-bezier(0.18, 0.92, 0.2, 1);
 }
 
 .map-player.dragging {

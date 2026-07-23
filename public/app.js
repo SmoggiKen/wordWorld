@@ -14,6 +14,17 @@ const islandPositions = [
   { x: 46, y: 20 }
 ];
 
+const islandSnapOffsets = [
+  { x: 0, y: 12 },
+  { x: -6, y: 9 },
+  { x: 6, y: 9 },
+  { x: -10, y: 3 },
+  { x: 10, y: 3 },
+  { x: -6, y: -4 },
+  { x: 6, y: -4 },
+  { x: 0, y: -7 }
+];
+
 const state = {
   profileId: localStorage.getItem("wordWorldProfileId"),
   profile: null,
@@ -26,7 +37,8 @@ const state = {
   tokenStack: readJson("wordWorldTokenStack", []),
   scanFile: null,
   inventoryOpen: false,
-  dragging: null
+  dragging: null,
+  snapPreviewIndex: null
 };
 
 const els = {
@@ -458,20 +470,13 @@ els.playerLayer.addEventListener("pointerdown", (event) => {
   token.setPointerCapture(event.pointerId);
   state.dragging = { profileId, pointerId: event.pointerId, rect: els.questMap.getBoundingClientRect(), mode: "pointer" };
   token.classList.add("dragging");
+  updateSnapPreview(profileId);
   event.preventDefault();
 });
 
 els.playerLayer.addEventListener("pointermove", (event) => {
   if (!state.dragging || state.dragging.pointerId !== event.pointerId) return;
-  const { profileId, rect } = state.dragging;
-  const x = clamp(((event.clientX - rect.left) / rect.width) * 100, 4, 96);
-  const y = clamp(((event.clientY - rect.top) / rect.height) * 100, 6, 94);
-  state.tokenPositions[profileId] = { x, y };
-  const token = els.playerLayer.querySelector(`[data-profile-id="${cssEscape(profileId)}"]`);
-  if (token) {
-    token.style.setProperty("--x", x);
-    token.style.setProperty("--y", y);
-  }
+  updateDraggedToken(event.clientX, event.clientY);
 });
 
 els.playerLayer.addEventListener("pointerup", finishDrag);
@@ -491,6 +496,7 @@ els.playerLayer.addEventListener("mousedown", (event) => {
   renderInventoryModal();
   state.dragging = { profileId, rect: els.questMap.getBoundingClientRect(), mode: "mouse" };
   token.classList.add("dragging");
+  updateSnapPreview(profileId);
   event.preventDefault();
 });
 
@@ -533,6 +539,7 @@ function updateSelectedTokenPosition(clientX, clientY, rect, profileId = state.p
     token.style.setProperty("--x", x);
     token.style.setProperty("--y", y);
   }
+  updateSnapPreview(profileId);
 }
 
 function completeDrag() {
@@ -541,6 +548,7 @@ function completeDrag() {
   token?.classList.remove("dragging");
   snapTokenToNearestIsland(profileId);
   applyTokenPosition(profileId);
+  clearSnapPreview();
   updateActiveTokenClasses();
   saveTokenPositions();
   saveTokenStack();
@@ -550,11 +558,7 @@ function completeDrag() {
 
 function moveCurrentPlayerToProgress() {
   const index = progressIslandIndex(state.groupStates.get(state.profileId));
-  const pos = islandPositions[index] || islandPositions[0];
-  state.tokenPositions[state.profileId] = {
-    x: clamp(pos.x + 2, 4, 96),
-    y: clamp(pos.y + 8, 6, 94)
-  };
+  state.tokenPositions[state.profileId] = snapAnchorForIsland(index, state.profileId);
   saveTokenPositions();
 }
 
@@ -562,34 +566,59 @@ function snapTokenToNearestIsland(profileId) {
   const current = state.tokenPositions[profileId];
   if (!current || !islandPositions.length) return;
 
-  let nearestIndex = 0;
-  let nearestDistance = Infinity;
-  islandPositions.forEach((island, index) => {
-    const distance = ((current.x - island.x) ** 2) + ((current.y - island.y) ** 2);
-    if (distance < nearestDistance) {
-      nearestDistance = distance;
-      nearestIndex = index;
-    }
-  });
-
-  const offset = snapOffsetFor(profileId);
-  const island = islandPositions[nearestIndex];
-  state.tokenPositions[profileId] = {
-    x: clamp(island.x + offset.x, 4, 96),
-    y: clamp(island.y + offset.y, 6, 94)
-  };
+  const target = nearestSnapTarget(current, profileId);
+  state.tokenPositions[profileId] = target.anchor;
 }
 
-function snapOffsetFor(profileId) {
+function nearestSnapTarget(point, profileId) {
+  let best = { islandIndex: 0, anchor: snapAnchorForIsland(0, profileId), distance: Infinity };
+  islandPositions.forEach((_, islandIndex) => {
+    snapAnchorsForIsland(islandIndex, profileId).forEach((anchor) => {
+      const distance = ((point.x - anchor.x) ** 2) + ((point.y - anchor.y) ** 2);
+      if (distance < best.distance) {
+        best = { islandIndex, anchor, distance };
+      }
+    });
+  });
+  return best;
+}
+
+function snapAnchorsForIsland(islandIndex, profileId) {
+  const island = islandPositions[islandIndex] || islandPositions[0];
   const index = Math.max(0, state.roster.findIndex((player) => player.id === profileId));
-  const offsets = [
-    { x: -5, y: 11 },
-    { x: 5, y: 11 },
-    { x: -1, y: 15 },
-    { x: 8, y: 15 },
-    { x: -8, y: 15 }
-  ];
-  return offsets[index % offsets.length];
+  const start = index % islandSnapOffsets.length;
+  return islandSnapOffsets.map((_, offsetIndex) => {
+    const offset = islandSnapOffsets[(start + offsetIndex) % islandSnapOffsets.length];
+    return {
+      x: clamp(island.x + offset.x, 4, 96),
+      y: clamp(island.y + offset.y, 6, 94)
+    };
+  });
+}
+
+function snapAnchorForIsland(islandIndex, profileId) {
+  return snapAnchorsForIsland(islandIndex, profileId)[0];
+}
+
+function updateSnapPreview(profileId) {
+  const current = state.tokenPositions[profileId];
+  if (!current) return;
+  const target = nearestSnapTarget(current, profileId);
+  if (target.islandIndex === state.snapPreviewIndex) return;
+  state.snapPreviewIndex = target.islandIndex;
+  updateIslandSnapClasses();
+}
+
+function clearSnapPreview() {
+  state.snapPreviewIndex = null;
+  updateIslandSnapClasses();
+}
+
+function updateIslandSnapClasses() {
+  const islands = els.islandMap.querySelectorAll("[data-island-index]");
+  for (const island of islands) {
+    island.classList.toggle("snap-target", Number(island.dataset.islandIndex) === state.snapPreviewIndex);
+  }
 }
 
 function applyTokenPosition(profileId) {
