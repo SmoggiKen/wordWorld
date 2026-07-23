@@ -492,18 +492,6 @@ els.scanForm.addEventListener("submit", async (event) => {
   }
 });
 
-els.islandMap.addEventListener("pointerenter", (event) => {
-  const island = event.target.closest("[data-island-index]");
-  if (!island) return;
-  renderIslandDetail(Number(island.dataset.islandIndex));
-}, true);
-
-els.islandMap.addEventListener("focusin", (event) => {
-  const island = event.target.closest("[data-island-index]");
-  if (!island) return;
-  renderIslandDetail(Number(island.dataset.islandIndex));
-});
-
 els.islandMap.addEventListener("click", (event) => {
   const island = event.target.closest("[data-island-index]");
   if (!island) return;
