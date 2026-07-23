@@ -219,20 +219,21 @@ function renderRoster() {
     const active = player.id === state.profileId;
     const progress = progressIslandIndex(profileState) + 1;
     const progressPercent = progressPercentFor(profileState);
+    const displayName = profile?.display_name || player.name;
     return `
       <div class="player-card ${active ? "active" : ""}">
         <button class="player-select-button" type="button" data-profile-id="${escapeHtml(player.id)}">
           ${playerToken(player, profile?.display_name)}
           <span class="player-card-main">
-            <strong>${escapeHtml(profile?.display_name || player.name)}</strong>
+            <strong>${escapeHtml(displayName)}</strong>
             <small>${yearLabelForLevel(profile?.level || 1)} - Island ${progress} - ${profile?.xp || 0} XP</small>
             <span class="player-progress" aria-label="${progressPercent}% complete">
               <span style="--progress: ${progressPercent}%;"></span>
             </span>
           </span>
         </button>
-        <button class="inventory-card-button" type="button" data-action="open-inventory" data-profile-id="${escapeHtml(player.id)}">
-          Inventory / Assess
+        <button class="inventory-card-button" type="button" data-action="open-inventory" data-profile-id="${escapeHtml(player.id)}" aria-label="Open inventory and assessment for ${escapeHtml(displayName)}" title="Inventory / Assess">
+          <span class="inventory-card-icon" aria-hidden="true"></span>
         </button>
       </div>
     `;
